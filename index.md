@@ -5,4 +5,4 @@ title: トップページ
 
 # トップページです
 
-* [raspirec]{{site.baseurl}}/rapirec.html)
++ [raspirec]({{site.baseurl}}/rapirec){:target="_blank"}
