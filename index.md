@@ -1,3 +1,8 @@
-### test
-this is test
-本日は晴天なり
+---
+layout: default
+title: トップページ
+---
+
+# トップページです
+
+* [raspirec]{{site.baseurl}}/rapirec.html)
