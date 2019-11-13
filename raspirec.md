@@ -32,10 +32,10 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 
 ## スクリーンショット
 
- [![]({{site.baseurl}}/img/top.png){: .ssimg}]({{site.baseurl}}/img/top.png)
- [![]({{site.baseurl}}/img/prg_tbl.png){: .ssimg}]({{site.baseurl}}/img/prg_tbl.png)
- [![]({{site.baseurl}}/img/rsv_tbl.png){: .ssimg}]({{site.baseurl}}/img/rsv_tbl.png)
- [![]({{site.baseurl}}/img/search.png){: .ssimg}]({{site.baseurl}}/img/search.png)
+* [![]({{site.baseurl}}/img/top.png){: .ssimg}]({{site.baseurl}}/img/top.png)
+* [![]({{site.baseurl}}/img/prg_tbl.png){: .ssimg}]({{site.baseurl}}/img/prg_tbl.png)
+* [![]({{site.baseurl}}/img/rsv_tbl.png){: .ssimg}]({{site.baseurl}}/img/rsv_tbl.png)
+* [![]({{site.baseurl}}/img/search.png){: .ssimg}]({{site.baseurl}}/img/search.png)
 
 
 ## ステータス
@@ -103,9 +103,11 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 
        `% git clone https://github.com/kaikoma-soft/raspirec.git`
 
+        すると raspirec というディレクトリが出来るので、それを $BaseDir とする。
+
     1. 環境に合わせてカスタマイズ
 
-       * 雛形の config.rb.sample を $HOME/raspirec/config.rb にコピー
+       * 雛形の config.rb.sample を $HOME/.config/raspirec/config.rb にコピー
        * コピーした config.rb をテキストエディタを使って、
          自分の環境に合わせるように修正する。
          とりあえず最低限必須なのは次のもの。詳細は doc/config.md を参照
@@ -124,7 +126,7 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 
   `% ruby ${BaseDir}/raspirec.rb`
 
-  でデーモンモードで起動する。(BaseDirはインストールしたディレクトリ)
+  でデーモンモードで起動する。
   <br>
   すぐに終了するが、バックグラウンドでサービスは走っているので、
   WEBブラウザ で http://ホスト名:4567/ でアクセスする。
