@@ -164,11 +164,12 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 
 ## リンク
 
-+ [gitHub raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
 + [gitHub recpt1]( https://github.com/stz2012/recpt1 ){:target="_blank"}
 + [gitHub epgdump]( https://github.com/Piro77/epgdump ){:target="_blank"}
 + [gitHub px4_drv]( https://github.com/nns779/px4_drv ){:target="_blank"}
 + [PLEX社 Linux用ドライバー]( http://www.plex-net.co.jp/download/ ){:target="_blank"}
++ [ナマケモノの家 raspirec](http://www.asahi-net.or.jp/~sy8y-siy/raspirec/ ){:target="_blank"}
++ [gitHub raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
 
 ## ライセンス
 このソフトウェアは、Apache License Version 2.0 ライセンスのも
