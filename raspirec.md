@@ -1,11 +1,5 @@
 ---
-layout: post
 title: Linux 系OS上で recpt1,epgdump を使って TV番組を録画する録画予約システム
-category: software
-excerpt_separator:  <!--more-->
-comments: false
-tags: linux ruby recpt1 epgdump web raspirec 録画管理プログラム 録画サーバー ラズパイ Raspberry Pi 録画予約システム
-description: Linux 系OS上で recpt1,epgdump を使って TV番組を録画する録画予約システム
 ---
 
 ## 目的

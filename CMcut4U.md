@@ -1,11 +1,5 @@
 ---
-layout: post
 title: CMcut4U ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って自動 CMカット
-category: software
-excerpt_separator:  <!--more-->
-comments: false
-tags: linux ruby opencv 自動CMカット ffmpeg
-description: Linux(Unix 系 OS) 上で ffmpeg,OpenCV 等を使って自動 CMカット
 ---
 
 -----------------
