@@ -60,7 +60,8 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 * jquery,Materialize を参照しているので、インターネットにアクセス出来る環境
   で動作させる事が必要。
   だたし、あらかじめ参照ファイルをダウンロードして置けばオフラインでも動作
-  させる事ができる。( doc/jquery_local.md を参照 )
+  させる事ができる。(
+  [doc/jquery_local.md](https://github.com/kaikoma-soft/raspirec/blob/master/doc/jquery_local.md) を参照 )
 
 * セキュリティにはあまり考慮していないので、インターネット側から
   アクセス出来る状態にしないで下さい。
@@ -103,14 +104,16 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 
        `% git clone https://github.com/kaikoma-soft/raspirec.git`
 
-        すると raspirec というディレクトリが出来るので、それを $BaseDir とする。
+       すると raspirec というディレクトリが出来るので、それを $BaseDir とする。
 
-    1. 環境に合わせてカスタマイズ
+    1. 環境に合わせて configファイルをカスタマイズ
 
        * 雛形の config.rb.sample を $HOME/.config/raspirec/config.rb にコピー
+         
        * コピーした config.rb をテキストエディタを使って、
          自分の環境に合わせるように修正する。
-         とりあえず最低限必須なのは次のもの。詳細は doc/config.md を参照
+         とりあえず最低限必須なのは次のもの。詳細は
+         [doc/config.md](https://github.com/kaikoma-soft/raspirec/blob/master/doc/config.md) を参照
          
          ```
          Recpt1_cmd        : recpt1 コマンドの path を指定する。
@@ -121,6 +124,10 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
          GR_tuner_num      : 地デジチュナー数
          BSCS_tuner_num    : BSCSチュナー数
          ```
+
+       * configファイルを $HOME/.config 以外の任意の場所に置きたい場合は、
+         環境変数 RASPIREC_CONF に絶対パスで指定して下さい。
+         
 
 * 実行方法
 
