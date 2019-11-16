@@ -5,6 +5,6 @@ title: トップページ
 
 # トップページです
 
-+ [raspirec]({{site.baseurl}}/raspirec.html){:target="_blank"}
++ [raspirec]({{site.baseurl}}/raspirec.html)
 
-+ [CMcut4U]({{site.baseurl}}/CMcut4U.html){:target="_blank"}
++ [CMcut4U]({{site.baseurl}}/CMcut4U.html)
