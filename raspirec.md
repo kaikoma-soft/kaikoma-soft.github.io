@@ -104,7 +104,8 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 
        `% git clone https://github.com/kaikoma-soft/raspirec.git`
 
-       すると raspirec というディレクトリが出来るので、それを $BaseDir とする。
+       すると raspirec というディレクトリが出来るので、
+       それを以下 $BaseDir とする。
 
     1. 環境に合わせて configファイルをカスタマイズ
 
@@ -127,7 +128,14 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 
        * configファイルを $HOME/.config 以外の任意の場所に置きたい場合は、
          環境変数 RASPIREC_CONF に絶対パスで指定して下さい。
-         
+
+    1. テスト実行
+
+       `% ruby ${BaseDir}/raspirec.rb -f`
+
+       一度フォアグラウンドで実行し、エラーが出ない事を確認する。
+       エラーメッセージがでなければ、Ctrl-C で中止する。
+
 
 * 実行方法
 
@@ -139,7 +147,7 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
   WEBブラウザ で http://ホスト名:4567/ でアクセスする。
   ( ポート番号の 4567はデフォルトの値で、config で変更可)
 
-  なお、PC の boot時に、自動で起動させたい場合は crontab に
+  なお、OS の boot時に、自動で起動させたい場合は crontab に
 
   `@reboot /usr/bin/ruby ${BaseDir}/raspirec.rb`
 
@@ -177,6 +185,7 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 + [PLEX社 Linux用ドライバー]( http://www.plex-net.co.jp/download/ ){:target="_blank"}
 + [ナマケモノの家 raspirec](http://www.asahi-net.or.jp/~sy8y-siy/raspirec/ ){:target="_blank"}
 + [gitHub raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
++ [gitHub Pages raspirec](https://kaikoma-soft.github.io/raspirec.html ){:target="_blank"}
 
 ## ライセンス
 このソフトウェアは、Apache License Version 2.0 ライセンスのも
