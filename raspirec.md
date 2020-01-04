@@ -187,6 +187,12 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 + [gitHub raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
 + [gitHub Pages raspirec](https://kaikoma-soft.github.io/raspirec.html ){:target="_blank"}
 
+
+## 不具合報告
+
+不具合報告等は、[gitHub の issues](https://github.com/kaikoma-soft/raspirec/issues ) の方にお願いします。
+
+
 ## ライセンス
 このソフトウェアは、Apache License Version 2.0 ライセンスのも
 とで公開します。詳しくは LICENSE を見て下さい。
