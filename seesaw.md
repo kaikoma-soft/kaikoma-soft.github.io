@@ -67,7 +67,7 @@ PC で録画した動画ファイルを、居間の TV に接続した Fire TV s
                   └── 番組B #02.mp4
 ```
 
-## 構成図
+## プログラム構成図
 
 [![]({{site.baseurl}}/img/seesaw_diagram.png){: .ssimg}]({{site.baseurl}}/img/seesaw_diagram.png)
 
@@ -234,6 +234,12 @@ samba で共有された動画ファイルに対して、次の操作をした�
 不具合報告などは、
 [GitHub issuse](https://github.com/kaikoma-soft/seesaw/issues)
 の方にお願いします。
+
+## リンク
+
++ [ナマケモノの家 seesaw](http://www.asahi-net.or.jp/~sy8y-siy/seesaw/ ){:target="_blank"}
++ [gitHub seesaw](https://github.com/kaikoma-soft/seesaw ){:target="_blank"}
++ [gitHub Pages seesaw](https://kaikoma-soft.github.io/seesaw.html ){:target="_blank"}
 
 ## ライセンス
 このソフトウェアは、Apache License Version 2.0 ライセンスのも
