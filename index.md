@@ -12,11 +12,11 @@ Linux 系OS上で recpt1,epgdump を使って TV番組を録画する録画予�
 
 ### [CMcut4U]({{site.baseurl}}/CMcut4U.html)
 
-Unix系OS 上で FFmpeg,OpenCV を使って自動 CMカットするプログラム (開発中止)
+Unix系OS 上で FFmpeg,OpenCV を使って自動 CMカットするプログラム (開発中止 CMcut4U2 移行)
 
 ### [CMcut4U2]({{site.baseurl}}/CMcut4U2.html)
 
-Unix系OS 上で FFmpeg,OpenCV を使って自動 CMカットするプログラム (改良版)
+Unix系OS 上で FFmpeg,OpenCV を使って自動 CMカットするプログラム (CMcut4U の後継)
 
 
 ### [seesaw]({{site.baseurl}}/seesaw.html)
