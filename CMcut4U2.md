@@ -2,7 +2,6 @@
 title: CMcut4U MkⅡ ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って半自動 CMカット
 ---
 
------------------
 ## はじめに
 
 本プログラムは、旧版である CMcut4U (https://github.com/kaikoma-soft/CMcut4U)
@@ -20,14 +19,12 @@ title: CMcut4U MkⅡ ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って半
 * 内部データ構造の整理
 
 
------------------
 ## 目的
 
 本プログラムの目的は「PT2等で録画した mpeg2tsファイルを半自動で CMカットし、
 希望の形式でエンコードをする」です。
 
 
------------------
 ## 特徴
 
 * CM/本編 自動判定の精度は 90% 程度だが、
@@ -37,11 +34,10 @@ title: CMcut4U MkⅡ ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って半
 * 自動判定が 上手く行かなかった時は、
   チャプター割り振りの変更を容易にする GUI で修正をする事が出来る
 
-* Linux(Unix 系 OS) 上のみで動作する。
+* Linux(Unix 系 OS) 上で動作する。
 
 
 
------------------
 ## プログラムの概要
 
 * TSファイルと、あらかじめ用意したlogo ファイルを入力することにより、
@@ -68,67 +64,65 @@ title: CMcut4U MkⅡ ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って半
 * エンコード終了後に、作成した本編、CM ファイルの二次判定を行う。
   二次判定は、動画プレイヤーにより
   本編に CM が混じっていないこと、CM に本編が混じっていないことを目視で
-  チェックする。
-  もし、変更が必要なら、修正GUI に戻って修正する。  
+  確認する。
+  もし、修正が必要なら、修正GUI に戻って修正する。  
   OK ならば、TSファイル、作業ファイルを削除して、終了とする。
   
 
 <!--more-->
 
------------------
 ## 実行に必要な環境
 
 * Ubuntu 18.04.1 LTS (多分Unix系ならなんでも)
-* ruby  2.5.1p57 以上
+* ruby  2.5.1 以上
 * ruby-gtk2 3.2.4
 * ruby-wave
-* python 2.7.15rc1
+* python 2.7 以上
 * Opencv 3.4.1
-* ffmpeg(ffprobe) 4.0
+* ffmpeg(ffprobe) 3.4.6
 * mpv 0.27.2
 * gimp ver.2.8.22
   (logoファイルの抽出に使用。矩形領域の切り抜きができれば何でも可)
 * X window (GUIツール の実行に必要)
 
 
------------------
 ## インストール
 
 下記のコマンド例は、Ubuntu でのものです。
 他の OS の場合は、コマンドやパッケージ名は適宜変更して下さい。
 
 ### ruby
-```sh
-$ sudo apt install ruby
-$ sudo apt install ruby-gtk2
-$ sudo gem install wav-file
+```
+% sudo apt install ruby
+% sudo apt install ruby-gtk2
+% sudo gem install wav-file
 ```
 
 ### python
-```sh
-$ sudo apt install python-dev python-numpy
+```
+% sudo apt install python-dev python-numpy
 ```
 
 ### ffmpeg & mpv
-```sh
-$ sudo apt install ffmpeg
-$ sudo apt install mpv
+```
+% sudo apt install ffmpeg
+% sudo apt install mpv
 ```
 
 ### opencv  
 opencv は公式パッケージには無いので、
 [opencvの 公式ページ](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html)
 の手順に従ってソースからインストール。
-```sh
-$ sudo apt install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
-$ sudo apt install libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libdc1394-22-dev
-$ mkdir tmp ; cd tmp
-$ git clone https://github.com/opencv/opencv.git
-$ git clone https://github.com/opencv/opencv_contrib.git
-$ cd opencv ; mkdir build ; cd build
-$ cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local ..
-$ make
-$ make install
+```
+% sudo apt install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+% sudo apt install libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libdc1394-22-dev
+% mkdir tmp ; cd tmp
+% git clone https://github.com/opencv/opencv.git
+% git clone https://github.com/opencv/opencv_contrib.git
+% cd opencv ; mkdir build ; cd build
+% cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local ..
+% make
+% sudo make install
 ```
 
 
@@ -136,10 +130,10 @@ $ make install
 
 1. インストールするディレクトリを決める。( 例:~/video/CMcut4U2  )
 
-    ```sh
-    mkdir -p  $HOME/video/CMcut4U2
-    cd $HOME/video/CMcut4U
-    git clone https://github.com/kaikoma-soft/CMcut4U-Mk2.git .
+    ```
+    % mkdir -p  $HOME/video/CMcut4U2
+    % cd $HOME/video/CMcut4U
+    % git clone https://github.com/kaikoma-soft/CMcut4U-Mk2.git .
     ```
     を実行する。
 
@@ -165,13 +159,12 @@ $ make install
 
 1. 入力ファイル、出力ファイル、作業用ディレクトリを作成する。  
    ( 下記の例は、Top が $HOME/video の場合 )
-    ```sh
+    ```
     % mkdir $HOME/video
     % cd $HOME/video
     % mkdir TS mp4 logo work
     ```
 
------------------
 ## ディレクトリ構造
 
 ### 入力データ( mpeg2ts ファイル )
@@ -202,7 +195,7 @@ Top
   生成される。
 
 
------------------
+
 ## 使用方法
 
 1. 録画した TS ファイルを「TS/番組名」ディレクトリの下に置く。
@@ -211,14 +204,13 @@ Top
    ( 後述する [logoファイルの作成方法](#create_logo) を参照して下さい。)
 
 1. 初回は、番組毎のパラメータ設定で、ロゴファイル等の設定を行う。
-
   ```sh
-  % CMcut4U.rb --paraedit
+  % CMcut4U2.rb --paraedit
   ```
 
 1. TSファイルの解析を行う。
   ```sh
-  % CMcut4U.rb
+  % CMcut4U2.rb
   ```
 
 1. 初回は、期待値が設定されていないので必ず NG になる。  
@@ -228,12 +220,12 @@ Top
 
 1. 再度コマンド実行すると、エンコードまで実行される。
   ```sh
-  % CMcut4U.rb
+  % CMcut4U2.rb
   ```
 
 1. 目視による最終チェックを行う。
   ```sh
-  % CMcut4U.rb --viewchk
+  % CMcut4U2.rb --viewchk
   ```
   動画プレイヤー(mpv)で、本編とCM が再生されるので、
   本編に CM が混じっていないこと、CM に本編が混じっていないことを目視で
@@ -243,20 +235,19 @@ Top
 
 
 
------------------
-### logo ファイルの作成方法 <a name="create_logo"></a>
+## logo ファイルの作成方法 <a name="create_logo"></a>
 
 1. 番組毎のパラメータ設定で、ロゴの位置を指定する。
    1. パラメータ設定ダイアログを起動する。
     ```sh
-    % CMcut4U.rb --paraedit
+    % CMcut4U2.rb --paraedit
     ```
     1. 対象ディレクトリを選択する。
     1. ロゴの位置(右上、右下、左下、左上)を選択し、保存してから閉じる。
 
-1. CMcut4U.rb --logo を実行する。 必要なら --regex で対象を絞る。
+1. CMcut4U2.rb --logo を実行する。 必要なら --regex で対象を絞る。
     ```sh
-    % CMcut4U.rb --logo
+    % CMcut4U2.rb --logo
     ```
     1. スクリーンショット生成の後、ビューアーで画像が表示されるので、
        ロゴマークが明瞭なものを探し、その画像を保存する。  
@@ -277,7 +268,7 @@ Top
     1. 「画像」-> 「モード」-> 「グレイスケール」で、グレイスケール化する。
     1. logo ディレクトリの下に、名前を付けて画像を保存する。
 
------------------
+
 ## 実行コマンドの説明
 
 + CMcut4U
@@ -421,7 +412,7 @@ Top
 
 
            
------------------
+
 ## カスタマイズ
 
 
