@@ -128,14 +128,13 @@ opencv は公式パッケージには無いので、
 
 ### 本ソフト
 
-1. インストールするディレクトリを決める。( 例:~/video/CMcut4U2  )
-
+1. インストールするディレクトリを決めて下記を実行する。
+   ( 例:~/video/CMcut4U2  )
     ```
     % mkdir -p  $HOME/video/CMcut4U2
     % cd $HOME/video/CMcut4U
     % git clone https://github.com/kaikoma-soft/CMcut4U-Mk2.git .
     ```
-    を実行する。
 
 1. 環境変数 PATH に上記のディレクトリを追加する。
 
@@ -332,7 +331,7 @@ Top
           
         - -\-force <a name="force"></a>
 
-          出力ファイルが既に存在すれば CM自動判定処理は飛ばすが、
+          通常出力ファイルが既に存在すれば CM自動判定処理は飛ばすが、
           それを強制的に実行させる。
 
         - -\-co <a name="co"></a>
@@ -375,7 +374,7 @@ Top
 
           番組毎に設定するパラメータを入力するパラメータ設定ダイアログを
           起動する。  
-          対象を絞る場合は、-R を併用する。
+          対象を絞る場合は、-\-regex を併用する。
 
           使い方は、
            + 対象のディレクトリを選択する。
@@ -385,14 +384,14 @@ Top
 
            ![GUI画面の例]({{site.baseurl}}/img/para.png)
 
-
         - -\-emptyPara <a name="emptyPara"> </a>
 
           パラメータが未設定のものだけパラメータ設定ダイヤログを起動する。
 
         - -\-tomp4 shell <a name="tomp4"></a>
 
-          mp4 エンコードするスクリプトの指定する。
+          mp4 エンコードするスクリプトの指定する。 優先順位は  
+          引数 > パラメータファイル > config
           
         - -\-autoremove  <a name="autoremove"></a>
 
@@ -401,13 +400,12 @@ Top
 
         - -\-forceEnc    <a name="forceEnc"></a>
 
-          期待値照合の結果を無視してエンコードを実行
-
+          期待値照合の結果を無視してエンコードを実行する。
 
         - -\-logo  <a name="logo"></a>
 
           ロゴ作成モードで実行する。
-          対象を絞る場合は、-R を併用する。
+          対象を絞る場合は、-\-regex を併用する。
 
 
 
@@ -415,4 +413,16 @@ Top
 
 ## カスタマイズ
 
+#### ffmpeg エンコード
+
+ディレクトリ libexe 以下に、エンコードに使うshellスクリプトがある。
+ffmpeg のオプション等を変えたい場合は、それらを直接書き換えるか、
+既存の物をコピーして変更を加える。
+
+
+## 連絡先
+
+不具合報告などは、
+[GitHub issuse](https://github.com/kaikoma-soft/CMcut4U-Mk2/issues)
+の方にお願いします。
 
