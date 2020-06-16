@@ -32,17 +32,24 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 
 ## スクリーンショット
 
-* [![]({{site.baseurl}}/img/top.png){: .ssimg}]({{site.baseurl}}/img/top.png)
-* [![]({{site.baseurl}}/img/prg_tbl.png){: .ssimg}]({{site.baseurl}}/img/prg_tbl.png)
-* [![]({{site.baseurl}}/img/rsv_tbl.png){: .ssimg}]({{site.baseurl}}/img/rsv_tbl.png)
-* [![]({{site.baseurl}}/img/search.png){: .ssimg}]({{site.baseurl}}/img/search.png)
+* Top画面
+  [![]({{site.baseurl}}/img/top.png){: .ssimg}]({{site.baseurl}}/img/top.png)
+* 番組表
+  [![]({{site.baseurl}}/img/prg_tbl.png){: .ssimg}]({{site.baseurl}}/img/prg_tbl.png)
+* 予約状況表
+  [![]({{site.baseurl}}/img/rsv_tbl.png){: .ssimg}]({{site.baseurl}}/img/rsv_tbl.png)
+* 番組検索
+[![]({{site.baseurl}}/img/search.png){: .ssimg}]({{site.baseurl}}/img/search.png)
+* mpvモニタ(raspbery Pi 3B+ に接続された PX-Q3U4 の映像を親機のdesktopに表示)
+[![]({{site.baseurl}}/img/mpv2.png){: .ssimg}]({{site.baseurl}}/img/mpv2.png)
+[![]({{site.baseurl}}/img/mpv.png){: .ssimg}]({{site.baseurl}}/img/mpv.png)
 
 
 ## ステータス
 
 * 現在運用試験中。
 * とりあえず録画で出来る所まで出来たので、β版で公開開始
-
+* 順次機能追加して行く予定。
 
 ## 実行に必要な環境
 
@@ -98,7 +105,7 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
    epgdump は、同じ名前で仕様の違うものがあるので、
    必ず https://github.com/Piro77/epgdump を使う。
 
-* 本体 ( raspirec )
+* raspirec ( 基本機能のみ、オプション機能は XXX を参照 )
 
     1. インストールするディレクトリに移動して
 

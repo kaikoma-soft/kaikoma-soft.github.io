@@ -4,7 +4,7 @@ title: CMcut4U MkⅡ ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って半
 
 ## はじめに
 
-本プログラムは、旧版である CMcut4U (https://github.com/kaikoma-soft/CMcut4U)
+本プログラムは、旧版である [CMcut4U](https://github.com/kaikoma-soft/CMcut4U)
 を、精度向上等を目的として再構築したものです。
 
 ## 旧版からの改良点
@@ -425,4 +425,11 @@ ffmpeg のオプション等を変えたい場合は、それらを直接書き�
 不具合報告などは、
 [GitHub issuse](https://github.com/kaikoma-soft/CMcut4U-Mk2/issues)
 の方にお願いします。
+
+## リンク
+
++ [mpv ドキュメント](https://mpv.io/manual/master/)
++ [ナマケモノの家 CMcut4UMk2](http://www.asahi-net.or.jp/~sy8y-siy/CMcut4UMk2/ ){:target="_blank"}
++ [gitHub CMcut4UMk2](https://github.com/kaikoma-soft/Mcut4U-Mk2 ){:target="_blank"}
++ [gitHub Pages CMcut4U2](https://kaikoma-soft.github.io/CMcut4U2.html ){:target="_blank"}
 
