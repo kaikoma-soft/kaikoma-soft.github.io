@@ -39,10 +39,10 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 * 予約状況表
   [![]({{site.baseurl}}/img/rsv_tbl.png){: .ssimg}]({{site.baseurl}}/img/rsv_tbl.png)
 * 番組検索
-[![]({{site.baseurl}}/img/search.png){: .ssimg}]({{site.baseurl}}/img/search.png)
+  [![]({{site.baseurl}}/img/search.png){: .ssimg}]({{site.baseurl}}/img/search.png)
 * mpvモニタ(raspbery Pi 3B+ に接続された PX-Q3U4 の映像を親機のdesktopに表示)
-[![]({{site.baseurl}}/img/mpv2.png){: .ssimg}]({{site.baseurl}}/img/mpv2.png)
-[![]({{site.baseurl}}/img/mpv.png){: .ssimg}]({{site.baseurl}}/img/mpv.png)
+  [![]({{site.baseurl}}/img/mpv2.png){: .ssimg}]({{site.baseurl}}/img/mpv2.png)
+  [![]({{site.baseurl}}/img/mpv.png){: .ssimg}]({{site.baseurl}}/img/mpv.png)
 
 
 ## ステータス
