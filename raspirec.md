@@ -35,13 +35,12 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 
 | Top画面 | 番組表 | 予約状況表
 | [![]({{site.baseurl}}/img/top.png){: .ssimg}]({{site.baseurl}}/img/top.png) |  [![]({{site.baseurl}}/img/prg_tbl.png){: .ssimg}]({{site.baseurl}}/img/prg_tbl.png) | [![]({{site.baseurl}}/img/rsv_tbl.png){: .ssimg}]({{site.baseurl}}/img/rsv_tbl.png)
-
 | 番組検索 | mpvモニタ(1) | mpvモニタ(2) |
 |   [![]({{site.baseurl}}/img/search.png){: .ssimg}]({{site.baseurl}}/img/search.png) | [![]({{site.baseurl}}/img/mpv2.png){: .ssimg}]({{site.baseurl}}/img/mpv2.png)  | [![]({{site.baseurl}}/img/mpv.png){: .ssimg}]({{site.baseurl}}/img/mpv.png)
+| hlsモニタ |
+|   [![]({{site.baseurl}}/img/hls.png){: .ssimg}]({{site.baseurl}}/img/hls.png)
 
  \* mpvモニタ(2)は raspbery Pi 3B+ に接続された PX-Q3U4 の映像を親機のdesktopに表示
-
-
 
 ## ステータス
 
@@ -103,7 +102,7 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
    epgdump は、同じ名前で仕様の違うものがあるので、
    必ず https://github.com/Piro77/epgdump を使う。
 
-* raspirec ( 基本機能のみ、オプション機能は XXX を参照 )
+* raspirec ( 基本機能のみ、オプション機能は [別紙]({{site.baseurl}}/raspirec-option)を参照 )
 
     1. インストールするディレクトリに移動して
 
