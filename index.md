@@ -9,7 +9,7 @@ title: トップページ
 
 Linux 系OS上で recpt1,epgdump を使って TV番組を録画する録画予約システム
 
-### [raspirec-opt]({{site.baseurl}}/raspirec-opt.html)
+#### [raspirec-option]({{site.baseurl}}/raspirec-option.html)
 
 raspirec のオプション機能の設定方法
 
