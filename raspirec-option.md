@@ -52,9 +52,7 @@ StreamDir    = DataDir + "/stream"
   * HLS変換スクリプトは、サンプルが tool/ts2hls_sample.sh にあるので、
     それを自分の環境に合わせて変更し使用する。
   * config.rb の変更を反映させるには、再起動が必要。
-
-なお、モニタは予約された録画が開始される前に自動的に停止する。
-
+  * モニタは予約された録画が開始される前に自動的に停止する。
 
 
 
@@ -113,3 +111,8 @@ XServerName     = "desktop"
 RecHostName     = "raspi"
 Lsof_cmd        = "/usr/bin/lsof"
 ```
+
+
+* Memo
+  * config.rb の変更を反映させるには、再起動が必要。
+  * モニタは予約された録画が開始される前に自動的に停止する。
