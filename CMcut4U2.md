@@ -132,7 +132,7 @@ opencv は公式パッケージには無いので、
    ( 例:~/video/CMcut4U2  )
     ```
     % mkdir -p  $HOME/video/CMcut4U2
-    % cd $HOME/video/CMcut4U
+    % cd $HOME/video/CMcut4U2
     % git clone https://github.com/kaikoma-soft/CMcut4U-Mk2.git .
     ```
 
@@ -155,6 +155,7 @@ opencv は公式パッケージには無いので、
  | FadeOutTime  | FadeOutの時間(秒)                                     |
  | Autoremove   | 作業ディレクトリの自動削除を行うか                    |
  | TsExpireDay  | ゴミ箱に移動したTSファイルを何日で削除するか(日)      |
+ | FrontMargin  | チャプターを打つタイミングとの継ぎ目のマージン(秒)    |
 
 1. 入力ファイル、出力ファイル、作業用ディレクトリを作成する。  
    ( 下記の例は、Top が $HOME/video の場合 )
@@ -270,7 +271,7 @@ Top
 
 ## 実行コマンドの説明
 
-+ CMcut4U
++ CMcut4U2
     - 機能  
       TS ディレクトリの tsファイルに対して解析を行い、
       CMカット、エンコードを行う。
