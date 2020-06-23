@@ -149,7 +149,7 @@ opencv は公式パッケージには無いので、
  | NomalSize    | エンコード後の本編画面サイズ               |
  | CMSize       | エンコード後の CM 画面サイズ               |
  | ToMp4        | エンコードスクリプトのデフォルト設定       |
- | MpvOption    | mpv 起動時のオプション文字列               |
+ | Mpv_opt      | mpv 起動時のオプション文字列               |
  | DelTSZero    | TSファイル削除時に、0byte のファイルを残すか |
  | FadeOut      | チャプターの継ぎ目にFadeOutを挿入するかのデフォルト値 |
  | FadeOutTime  | FadeOutの時間(秒)                                     |
