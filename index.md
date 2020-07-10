@@ -9,9 +9,7 @@ title: トップページ
 
 Linux 系OS上で recpt1,epgdump を使って TV番組を録画する録画予約システム
 
-#### [raspirec-option]({{site.baseurl}}/raspirec-option.html)
-
-raspirec のオプション機能の設定方法
+ * [raspirec のオプション機能の設定方法]({{site.baseurl}}/raspirec-option.html)
 
 ### [CMcut4U]({{site.baseurl}}/CMcut4U.html)
 
@@ -21,6 +19,8 @@ Unix系OS 上で FFmpeg,OpenCV を使って自動 CMカットするプログラ�
 
 Unix系OS 上で FFmpeg,OpenCV を使って自動 CMカットするプログラム (CMcut4U の後継)
 
+ * [字幕処理の説明]({{site.baseurl}}/subtitle.html)
+ 
 
 ### [seesaw]({{site.baseurl}}/seesaw.html)
 
