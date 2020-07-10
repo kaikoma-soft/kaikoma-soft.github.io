@@ -153,9 +153,11 @@ opencv は公式パッケージには無いので、
  | DelTSZero    | TSファイル削除時に、0byte のファイルを残すか |
  | FadeOut      | チャプターの継ぎ目にFadeOutを挿入するかのデフォルト値 |
  | FadeOutTime  | FadeOutの時間(秒)                                     |
- | Autoremove   | 作業ディレクトリの自動削除を行うか                    |
+ | Autoremove   | 作業ディレクトリの自動削除を行うか (true=行う)        |
  | TsExpireDay  | ゴミ箱に移動したTSファイルを何日で削除するか(日)      |
  | FrontMargin  | チャプターを打つタイミングとの継ぎ目のマージン(秒)    |
+ | Subtitling   | 字幕の処理を行うか(true=行う)                         |
+ | ForceCmTime  |  強制的にCMする秒数の候補                             |
 
 1. 入力ファイル、出力ファイル、作業用ディレクトリを作成する。  
    ( 下記の例は、Top が $HOME/video の場合 )
