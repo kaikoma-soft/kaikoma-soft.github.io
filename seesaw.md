@@ -238,7 +238,7 @@ samba で共有された動画ファイルに対して、次の操作をした�
 
 ## リンク
 
-+ [ナマケモノの家 seesaw](http://www.asahi-net.or.jp/~sy8y-siy/seesaw/ ){:target="_blank"}
++ [ナマケモノの家 seesaw](http://www.asahi-net.or.jp/~sy8y-siy/src/seesaw.html ){:target="_blank"}
 + [gitHub seesaw](https://github.com/kaikoma-soft/seesaw ){:target="_blank"}
 + [gitHub Pages seesaw](https://kaikoma-soft.github.io/seesaw.html ){:target="_blank"}
 
