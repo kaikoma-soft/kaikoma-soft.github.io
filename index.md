@@ -1,5 +1,4 @@
 ---
-layout: default
 title: トップページ
 ---
 
@@ -20,6 +19,7 @@ Unix系OS 上で FFmpeg,OpenCV を使って自動 CMカットするプログラ�
 Unix系OS 上で FFmpeg,OpenCV を使って自動 CMカットするプログラム (CMcut4U の後継)
 
  * [字幕処理の説明]({{site.baseurl}}/subtitle.html)
+ * [ロゴ消し機能]({{site.baseurl}}/src/CMcut4U2-removelogo.html )
  
 
 ### [seesaw]({{site.baseurl}}/seesaw.html)
