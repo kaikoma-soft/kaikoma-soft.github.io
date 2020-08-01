@@ -28,6 +28,7 @@ CMcut4U2 Ver 0.3.0 で追加されたロゴ消し機能についての説明で�
 ## config.rb に追加された定数 <a name="config"></a>
 
 <pre>
+RmLogoDir      = Top + "/rmlogo"
 RmLogoBlurList = {
   :null      => "null",                        # 素通し
   :smartblur1 => "smartblur=1:1:0:1:1:0",
@@ -40,6 +41,7 @@ RmLogoBlurDefault = :unsharp1
 
 | 定数名           |   意味            |
 |------------------|-------------------|
+| RmLogoDir        | ロゴのマスクデータを格納するディレクトリ |
 | RmLogoBlurList   | ぼかしフィルターのリスト。|
 | RmLogoBlurDefault | RmLogoBlurList 中のからパラメータ設定ダイアログの初期値とするものを指定 |
 
@@ -105,6 +107,7 @@ RmLogoBlurDefault = :unsharp1
       | ABCDEFG| 任意の文字列(ただし ```:```は避ける)
       | W , H  | ロゴの幅、高さ (整数)  |
       | X , Y  | ロゴの左上の位置(整数) |
+      | 置き場所 | RmLogoDir で指定したディレクトリ |
 
     1. 確認
    <br>
