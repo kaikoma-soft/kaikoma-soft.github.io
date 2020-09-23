@@ -18,6 +18,9 @@ title: CMcut4U MkⅡ ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って半
 * 作業終了で、テンポラリファイルを削除、
   TSファイルもゴミ箱に移動させた後、一定時間後に自動削除するように。
 * 内部データ構造の整理
+* [字幕処理の追加](subtitle.html)
+* [ロゴ消し機能](CMcut4U2-removelogo.html )
+* [CM/本編 判定ユーザー定義マクロ](CMcut4U2-macro.html )
 
 
 ## 目的
@@ -31,12 +34,9 @@ title: CMcut4U MkⅡ ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って半
 * CM/本編 自動判定の精度は 90% 程度だが、
   番組毎に期待値を設定することにより、
   CMカットが上手く行ったかの見分けを容易としている。
-
 * 自動判定が 上手く行かなかった時は、
   チャプター割り振りの変更を容易にする GUI で修正をする事が出来る
-
 * Linux(Unix 系 OS) 上で動作する。
-
 
 
 ## プログラムの概要
@@ -158,7 +158,8 @@ opencv は公式パッケージには無いので、
  | TsExpireDay  | ゴミ箱に移動したTSファイルを何日で削除するか(日)      |
  | FrontMargin  | チャプターを打つタイミングとの継ぎ目のマージン(秒)    |
  | Subtitling   | 字幕の処理を行うか(true=行う)                         |
- | ForceCmTime  |  強制的にCMする秒数の候補                             |
+ | ForceCmTime  | 強制的にCMする秒数の候補                              |
+ | LIBEXEC2     | カスタマイズしたスクリプトを置くディレクトリを指定する。<BR> CMcut4U2/libexec の代替 |
 
 1. 入力ファイル、出力ファイル、作業用ディレクトリを作成する。  
    ( 下記の例は、Top が $HOME/video の場合 )
