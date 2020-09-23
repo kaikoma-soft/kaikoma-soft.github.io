@@ -20,6 +20,7 @@ Unix系OS 上で FFmpeg,OpenCV を使って自動 CMカットするプログラ�
 
  * [字幕処理の説明]({{site.baseurl}}/src/subtitle.html)
  * [ロゴ消し機能]({{site.baseurl}}/src/CMcut4U2-removelogo.html )
+ * [CM/本編 判定ユーザー定義マクロ]({{site.baseurl}}/src/CMcut4U2-macro.html )
  
 
 ### [seesaw]({{site.baseurl}}/seesaw.html)
