@@ -10,6 +10,10 @@ Linux 系OS上で recpt1,epgdump を使って TV番組を録画する録画予�
 
  * [raspirec のオプション機能の設定方法]({{site.baseurl}}/raspirec-option.html)
 
+### [docker-raspirec]({{site.baseurl}}/src/docker-raspirec.html)
+
+raspirec を Docker 上で動作テストするための環境
+
 ### [CMcut4U]({{site.baseurl}}/CMcut4U.html)
 
 Unix系OS 上で FFmpeg,OpenCV を使って自動 CMカットするプログラム (開発中止 CMcut4U2 に移行)
