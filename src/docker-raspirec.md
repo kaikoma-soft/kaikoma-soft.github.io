@@ -1,14 +1,26 @@
 
 ## 目的
 
-raspirec の動作テストをする為の docker コンテナです。
+[raspirec](https://kaikoma-soft.github.io/raspirec.html) の動作テストを
+行う docker 環境一式です。
 
 ## 条件
 
 * ホストマシンに、docker がインストールされていること
-  <pre>
-    % apt install docker.io
-  </pre>
+  * ubuntu の例
+    <pre>
+      % apt install docker.io
+    </pre>
+
+  * Raspbian の例
+    <br>
+    パッケージの docker は古いので、公式からインストールする。
+    詳細は [google 検索](https://www.google.com/search?client=opera&q=Raspbian+docker+インストール&sourceid=opera&ie=UTF-8&oe=UTF-8)
+    で。
+    <pre>
+      % curl -sSL https://get.docker.com/ | sh
+      % usermod $USER -aG docker</pre>
+
 * ホスト側に、チューナーカードに対応したドライバーがインストールされていること
   <br>
   ( recpt1/recsvb の切り替えはデバイスファイルを見て自動対応します。 )
@@ -119,20 +131,31 @@ raspirec の動作テストをする為の docker コンテナです。
 
 ## 動作確認環境
 
-|  ホストOS  |  Ubuntu 18.04.5 LTS |
-| チューナー | PT2, PX-Q3U4        |
-| ドライバー | pt1_drv,px4_drv,DVBドライバ(OS標準) |
-| Docker     | 19.03.6             |
-| Docker ベース・イメージ | Ubuntu:20.10 |
+|  ホストOS  |  Ubuntu 18.04.5 LTS | Raspbian GNU/Linux 9 (stretch) |
+| チューナー |  PT2                | PX-Q3U4        |
+| ドライバー | pt1_drv,DVBドライバ(OS標準) | px4_drv |
+| Docker     | 19.03.6             | 19.03.13  |
+| Docker ベース・イメージ | Ubuntu:20.10 | raspbian/stretch |
+| 生成したImage のサイズ | 178MB (  HLS有効の場合は 615MB) | 392MB |
 
 ## 注意事項
 
 * 動作テスト用なので、ファイルサイズ、セキュリティの考慮はしていません。
-  <BR>
-  HLSモニタ機能有効にした場合 615MB, しない場合 178MB 程度を使用します。
 
 ## リンク
-[recdvb](https://github.com/dogeel/recdvb)
++ [recpt1]( https://github.com/stz2012/recpt1 ){:target="_blank"}
++ [recdvb](https://github.com/dogeel/recdvb)
++ [epgdump]( https://github.com/Piro77/epgdump ){:target="_blank"}
++ [px4_drv]( https://github.com/nns779/px4_drv ){:target="_blank"}
++ [ナマケモノの家 raspirec](http://www.asahi-net.or.jp/~sy8y-siy/src/raspirec.html ){:target="_blank"}
++ [gitHub raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
++ [gitHub Pages raspirec](https://kaikoma-soft.github.io/raspirec.html ){:target="_blank"}
+
+## 連絡先
+
+不具合報告などは、
+[GitHub issuse](https://github.com/kaikoma-soft/docker-raspirec/issues)
+の方にお願いします。
 
 ## ライセンス
 このソフトウェアは、Apache License Version 2.0 ライセンスのも
