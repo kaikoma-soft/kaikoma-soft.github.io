@@ -6,14 +6,46 @@ title: Linux 系OS上で recpt1,epgdump を使って TV番組を録画する録�
 ## 目的
 
 本プログラム(raspirec) は Linux 系OS上で、
-recpt1,epgdump を使って TV番組を録画する録画サーバーを構築するための
+recpt1/recdvb,epgdump を使って TV番組を録画する録画サーバーを構築するための
 録画予約システムです。
 <br>
 特に、ラズパイのようなシングルボードコンピュータ(SBC)で動作させる事に最適化しています。
 
-なお動作には recpt1 に対応しているドライバーがあるTVチューナー
+なお動作には recpt1/recdvb に対応しているドライバーがあるTVチューナー
 ( アースソフト社製 PT1〜3, PLEX社製 PX-W3U4、PX-W3PE4、PX-Q3U4、PX-Q3PE4 等)
 が必要です。
+
+  <table>
+    <tr>
+      <th> チューナーカード名</th>
+      <th> ドライバー  </th>
+      <th> デバイスファイル </th>
+      <th> 録画コマンド </th>
+    </tr>
+    <tr>
+      <td> PT1, PT2 </td>
+      <td> pt1_drv </td>
+      <td> /dev/pt1video0 </td>
+      <td rowspan="3"> recpt1 </td>
+    </tr>
+    <tr>
+      <td> PT3 </td>
+      <td> pt3_drv </td>
+      <td> /dev/pt3video0 </td>
+    </tr>
+    <tr>
+      <td> Plex社製 PX-Q3U4 等</td>
+      <td> px4_drv </td>
+      <td> /dev/px4video0 </td>
+    </tr>
+    <tr>
+      <td> PT1, PT2, PT3 </td>
+      <td> DVBドライバ(OS標準) </td>
+      <td> /dev/dvb/adapter0/frontend0 </td>
+      <td> recdvb *1</td>
+    </tr>
+  </table>
+  *1 : recdvb は本家のものではなく recpt1互換の [ dogeel版 recdvb](https://github.com/dogeel/recdvb) を使用します。
 
 ## 特徴
 
@@ -54,7 +86,7 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 * Linux系 OSが稼働するPC と OS (ドライバーさえあれば UNIX系なら何でも可)
 * ruby  2.5 以上
 * sqlite3
-* TVチューナー ( recpt1 のドライバーが存在するもの )
+* TVチューナー ( recpt1/recdvb のドライバーが存在するもの )
 * recpt1 ( https://github.com/stz2012/recpt1 を推奨 )
 * epgdump ( https://github.com/Piro77/epgdump を推奨 )
 * もし b25 デコードするなら b25 ライブラリ + カードリーダー
@@ -184,9 +216,10 @@ recpt1,epgdump を使って TV番組を録画する録画サーバーを構築�
 
 ## リンク
 
-+ [gitHub recpt1]( https://github.com/stz2012/recpt1 ){:target="_blank"}
-+ [gitHub epgdump]( https://github.com/Piro77/epgdump ){:target="_blank"}
-+ [gitHub px4_drv]( https://github.com/nns779/px4_drv ){:target="_blank"}
++ [recpt1]( https://github.com/stz2012/recpt1 ){:target="_blank"}
++ [dogeel版 recdvb](https://github.com/dogeel/recdvb){:target="_blank"}
++ [epgdump]( https://github.com/Piro77/epgdump ){:target="_blank"}
++ [px4_drv]( https://github.com/nns779/px4_drv ){:target="_blank"}
 + [PLEX社 Linux用ドライバー]( http://www.plex-net.co.jp/download/ ){:target="_blank"}
 + [ナマケモノの家 raspirec](http://www.asahi-net.or.jp/~sy8y-siy/src/raspirec.html ){:target="_blank"}
 + [gitHub raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
