@@ -4,17 +4,17 @@ title: トップページ
 
 ## ナマケモノの家
 
-### [raspirec]({{site.baseurl}}/raspirec.html)
+### [raspirec]({{site.baseurl}}/src/raspirec.html)
 
 Linux 系OS上で recpt1,epgdump を使って TV番組を録画する録画予約システム
 
- * [raspirec のオプション機能の設定方法]({{site.baseurl}}/raspirec-option.html)
+ * [raspirec のオプション機能の設定方法]({{site.baseurl}}/src/raspirec-option.html)
 
 ### [docker-raspirec]({{site.baseurl}}/src/docker-raspirec.html)
 
 raspirec を Docker 上で動作テストするための環境
 
-### [CMcut4U]({{site.baseurl}}/CMcut4U.html)
+### [CMcut4U]({{site.baseurl}}/src/CMcut4U.html)
 
 Unix系OS 上で FFmpeg,OpenCV を使って自動 CMカットするプログラム (開発中止 CMcut4U2 に移行)
 
@@ -27,7 +27,7 @@ Unix系OS 上で FFmpeg,OpenCV を使って自動 CMカットするプログラ�
  * [CM/本編 判定ユーザー定義マクロ]({{site.baseurl}}/src/CMcut4U2-macro.html )
  
 
-### [seesaw]({{site.baseurl}}/seesaw.html)
+### [seesaw]({{site.baseurl}}/src/seesaw.html)
 
 Samba と連携して、Samba経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム
 
