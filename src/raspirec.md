@@ -1,5 +1,5 @@
 ---
-title: Linux 系OS上で recpt1,epgdump を使って TV番組を録画する録画予約システム
+title: Linux 系OS上で recpt1/recdvb,epgdump を使って TV番組を録画する録画予約システム
 ---
 
 
@@ -212,6 +212,13 @@ recpt1/recdvb,epgdump を使って TV番組を録画する録画サーバーを�
 | OS           |  Raspbian Stretch   | Ubuntu 18.04.3 LTS
 | TVチューナー |  PX-Q3U4            | PT2
 | ドライバー   |  px4_drv            | pt1_drv
+
+## Docker を使ったテスト環境
+
+Docker を使ったテスト環境を用意しましたので、
+簡単に動作テストをする事が出来ます。
++ [ソース](https://github.com/kaikoma-soft/docker-raspirec){:target="_blank"}
++ [ドキュメント](https://kaikoma-soft.github.io/src/docker-raspirec.html){:target="_blank"}
 
 
 ## リンク
