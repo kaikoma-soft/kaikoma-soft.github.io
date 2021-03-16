@@ -1,7 +1,7 @@
 
 ## 目的
 
-[raspirec](https://kaikoma-soft.github.io/raspirec.html) の動作テストを
+[raspirec](https://kaikoma-soft.github.io/src/raspirec.html) の動作テストを
 行う docker 環境一式です。
 
 ## 条件
@@ -149,7 +149,7 @@
 + [px4_drv]( https://github.com/nns779/px4_drv ){:target="_blank"}
 + [ナマケモノの家 raspirec](http://www.asahi-net.or.jp/~sy8y-siy/src/raspirec.html ){:target="_blank"}
 + [gitHub raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
-+ [gitHub Pages raspirec](https://kaikoma-soft.github.io/raspirec.html ){:target="_blank"}
++ [gitHub Pages raspirec](https://kaikoma-soft.github.io/src/raspirec.html ){:target="_blank"}
 
 ## 連絡先
 
