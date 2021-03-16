@@ -70,7 +70,7 @@ Subtitling  = true    # 字幕の処理を行う
 ### ffmpeg のインストール
 
 ```
-% git clone https://github.com/FFmpeg/FFmpeg.git -b release/4.3
+% git clone https://github.com/FFmpeg/FFmpeg.git --depth 1 -b n4.3
 % cd FFmpeg
 % ./configure --prefix=/usr/local/ffmpeg/4.3 --enable-gpl --enable-libx265 --enable-libx264  --enable-libaribb24 --enable-libass --enable-version3
 % make -j 4
