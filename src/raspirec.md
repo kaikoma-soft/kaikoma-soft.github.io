@@ -230,7 +230,7 @@ Docker を使ったテスト環境を用意しましたので、
 + [PLEX社 Linux用ドライバー]( http://www.plex-net.co.jp/download/ ){:target="_blank"}
 + [ナマケモノの家 raspirec](http://www.asahi-net.or.jp/~sy8y-siy/src/raspirec.html ){:target="_blank"}
 + [gitHub raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
-+ [gitHub Pages raspirec](https://kaikoma-soft.github.io/raspirec.html ){:target="_blank"}
++ [gitHub Pages raspirec](https://kaikoma-soft.github.io/src/raspirec.html ){:target="_blank"}
 
 
 ## 不具合報告

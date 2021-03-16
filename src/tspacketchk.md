@@ -151,7 +151,7 @@ NG の場合、一部のツールで上手く扱えない可能性がある。(�
 ## リンク
 
 + [gitHub tspacketchk](https://github.com/kaikoma-soft/tspacketchk ){:target="_blank"}
-+ [gitHub Pages tspacketchk](https://kaikoma-soft.github.io/tspacketchk.html ){:target="_blank"}
++ [gitHub Pages tspacketchk](https://kaikoma-soft.github.io/src/tspacketchk.html ){:target="_blank"}
 
 
 ## 謝辞

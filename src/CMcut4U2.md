@@ -436,5 +436,5 @@ ffmpeg のオプション等を変えたい場合は、それらを直接書き�
 + [mpv ドキュメント](https://mpv.io/manual/master/)
 + [ナマケモノの家 CMcut4UMk2](http://www.asahi-net.or.jp/~sy8y-siy/src/CMcut4U2.html ){:target="_blank"}
 + [gitHub CMcut4UMk2](https://github.com/kaikoma-soft/CMcut4U-Mk2 ){:target="_blank"}
-+ [gitHub Pages CMcut4U2](https://kaikoma-soft.github.io/CMcut4U2.html ){:target="_blank"}
++ [gitHub Pages CMcut4U2](https://kaikoma-soft.github.io/src/CMcut4U2.html ){:target="_blank"}
 
