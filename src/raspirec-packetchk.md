@@ -17,7 +17,7 @@ title: raspirec パケットチェック機能
 結果は、「録画済み一覧」の画面に表示されます。
 
 
-[![表示画面のサンプル]({{site.baseurl}}/img/packetchk.png){: .ssimg}]({{site.baseurl}}/img/packetchk.png)
+[![]({{site.baseurl}}/img/packetchk2.png){: .ssimg}]({{site.baseurl}}/img/packetchk2.png)
 
 
 ## 機能を有効にするには
