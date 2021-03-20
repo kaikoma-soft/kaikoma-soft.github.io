@@ -1,5 +1,5 @@
 ---
-title: raspirec オプション機能の設定方法
+title: raspirec 「hlsモニタ機能」,「mpvモニタ機能」の設定方法
 ---
 
 
