@@ -17,7 +17,7 @@ title: raspirec パケットチェック機能
 結果は、「録画済み一覧」の画面に表示されます。
 
 
-[![]({{site.baseurl}}/img/packetchk.png){: .ssimg}]({{site.baseurl}}/img/packetchk.png)
+[![表示画面のサンプル]({{site.baseurl}}/img/packetchk.png){: .ssimg}]({{site.baseurl}}/img/packetchk.png)
 
 
 ## 機能を有効にするには
@@ -29,7 +29,7 @@ title: raspirec パケットチェック機能
 を参照。
 
 *  config.rb 中に下記の定数を設定する。
-   * PacketChk_enable を true
+   * PacketChk_enable を true 
    * PacketChk_cmd に tspacketchk のインストール先を設定
    * PacketChk_rate は、実測値からフィードバックして設定
    * PacketChk_threshold には、画面上で赤枠を付ける閾値を設定
@@ -44,7 +44,7 @@ PacketChk_threshold  = 2                            # エラーと判定する�
 PacketChk_rate       = 100                          # 想定速度 ( Mbyte/秒 )
 ```
 
-
+ 
 * raspirec を再起動する。
 
 
