@@ -53,7 +53,7 @@ Subtitling  = true    # 字幕の処理を行う
 
 ### 必要なパッケージのインストール
 ```
-% sudo apt install make autoconf libtool libaribb24-dev nasm pkg-config libx265-dev libx264-dev vainfo libvdpau-dev libva-dev nvidia-cuda-dev libass-dev
+% sudo apt install make autoconf libtool libaribb24-dev nasm pkg-config libx265-dev libx264-dev vainfo libvdpau-dev libva-dev nvidia-cuda-dev libass-dev libsdl2-dev
 ```
 
 
@@ -72,7 +72,7 @@ Subtitling  = true    # 字幕の処理を行う
 ```
 % git clone https://github.com/FFmpeg/FFmpeg.git --depth 1 -b n4.3
 % cd FFmpeg
-% ./configure --prefix=/usr/local/ffmpeg/4.3 --enable-gpl --enable-libx265 --enable-libx264  --enable-libaribb24 --enable-libass --enable-version3
+% ./configure --prefix=/usr/local/ffmpeg/4.3 --enable-gpl --enable-libx265 --enable-libx264  --enable-libaribb24 --enable-libass --enable-version3 --enable-sdl
 % make -j 4
 % sudo make install
 ```
