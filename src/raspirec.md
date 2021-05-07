@@ -40,12 +40,12 @@ recpt1/recdvb,epgdump を使って TV番組を録画する録画サーバーを�
     </tr>
     <tr>
       <td> PT1, PT2, PT3 </td>
-      <td> DVBドライバ(OS標準) </td>
+      <td> earth_pt1,earth_pt3 </td>
       <td> /dev/dvb/adapter0/frontend0 </td>
       <td> recdvb *1</td>
     </tr>
   </table>
-  *1 : recdvb は本家のものではなく recpt1互換の [ dogeel版 recdvb](https://github.com/dogeel/recdvb) を使用します。
+  *1 : recdvb は本家のものではなく [recpt1互換の recdvb](https://github.com/kaikoma-soft/recdvb) を使用します。
 
 ## 特徴
 
@@ -207,12 +207,13 @@ recpt1/recdvb,epgdump を使って TV番組を録画する録画サーバーを�
 
 ## 動作確認環境
 
-|              |  その１             | その２
-|--------------+---------------------+-----------------------------|
-| 機種         |  raspberry pi 3B+   | AMD Ryzen 7 2700 + MEM 16G
-| OS           |  Raspbian Stretch   | Ubuntu 18.04.3 LTS
-| TVチューナー |  PX-Q3U4            | PT2
-| ドライバー   |  px4_drv            | pt1_drv
+|              |  その１            | その２                      | その３
+|--------------+--------------------+-----------------------------+--------
+| 機種         |  raspberry pi 3B+  | AMD Ryzen 7 2700 + MEM 16G  | ←
+| OS           |  Raspbian Stretch  | Ubuntu 20.04.2 LTS          | ←
+| TVチューナー |  PX-Q3U4           | PT2                         | ←
+| ドライバー   |  px4_drv           | pt1_drv                     | earth_pt1
+| 録画ソフト   | recpt1             | recpt1                      | recdvb 
 
 ## Docker を使ったテスト環境
 
@@ -225,7 +226,7 @@ Docker を使ったテスト環境を用意しましたので、
 ## リンク
 
 + [recpt1]( https://github.com/stz2012/recpt1 ){:target="_blank"}
-+ [dogeel版 recdvb](https://github.com/dogeel/recdvb){:target="_blank"}
++ [recdvb](https://github.com/kaikoma-soft/recdvb){:target="_blank"}
 + [epgdump]( https://github.com/Piro77/epgdump ){:target="_blank"}
 + [px4_drv]( https://github.com/nns779/px4_drv ){:target="_blank"}
 + [PLEX社 Linux用ドライバー]( http://www.plex-net.co.jp/download/ ){:target="_blank"}
