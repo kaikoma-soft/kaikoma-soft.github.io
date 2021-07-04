@@ -11,6 +11,7 @@ Linux 系OS上で recpt1,epgdump を使って TV番組を録画する録画予�
 * 機能追加
     * [hls, mpv モニタ機能の設定方法]({{site.baseurl}}/src/raspirec-option.html) (ver0.5.0 以降)
     * [パケットチェック機能の説明]({{site.baseurl}}/src/raspirec-packetchk.html) (Ver1.0.0 以降)
+    * [独立GUI mpvモニタ raspirecTV の説明]({{site.baseurl}}/src/raspirec-TV.html) (Ver1.2.0 以降)
 
 
 ### [docker-raspirec]({{site.baseurl}}/src/docker-raspirec.html)

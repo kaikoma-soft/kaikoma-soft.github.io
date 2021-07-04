@@ -61,6 +61,7 @@ recpt1/recdvb,epgdump を使って TV番組を録画する録画サーバーを�
 * チューナーの数とは別に、同時録画の本数で制限を掛ける事が可能。
   (SBCの場合、能力不足により本数制限が必要になる。)
 * Ver1.1.0 から PX-MLT8PE のような 3波(地デジ/BS/CS)チューナーも使用可
+* Ver1.2.0 から 独立した GUIで「mpv モニタ機能」が使える raspirecTV をリリース
 
 <!--more-->
 
@@ -73,15 +74,9 @@ recpt1/recdvb,epgdump を使って TV番組を録画する録画サーバーを�
 
  \* mpvモニタ(2)は raspbery Pi 3B+ に接続された PX-Q3U4 の映像を親機のdesktopに表示
 
-| hlsモニタ <br>  [![]({{site.baseurl}}/img/hls.png){: .ssimg}]({{site.baseurl}}/img/hls.png)
+| hlsモニタ <br>  [![]({{site.baseurl}}/img/hls.png){: .ssimg}]({{site.baseurl}}/img/hls.png)| raspirecTV <br> [![]({{site.baseurl}}/img/TV2.png){: .ssimg}]({{site.baseurl}}/img/TV2.png)
 
 
-## ステータス
-
-* 現在運用試験中。
-* とりあえず録画で出来る所まで出来たので、β版で公開開始 (2019/09/23)
-* 順次機能追加して行く予定。
-* 機能追加が一段落したのでβ版からリリース版に昇格 (2021/03/20 )
 
 ## 実行に必要な環境
 
@@ -89,24 +84,22 @@ recpt1/recdvb,epgdump を使って TV番組を録画する録画サーバーを�
 * ruby  2.5 以上
 * sqlite3
 * TVチューナー ( recpt1/recdvb のドライバーが存在するもの )
-* recpt1 ( https://github.com/stz2012/recpt1 を推奨 )
+* recpt1 ( [https://github.com/stz2012/recpt1](https://github.com/stz2012/recpt1)  )
+  又は recdvb ( [https://github.com/kaikoma-soft/recdvb](https://github.com/kaikoma-soft/recdvb) ) を推奨
 * epgdump ( https://github.com/Piro77/epgdump を推奨 )
 * もし b25 デコードするなら b25 ライブラリ + カードリーダー
 
 
 ## 制限事項
 
-* jquery,Materialize を参照しているので、インターネットにアクセス出来る環境
-  で動作させる事が必要。
-  だたし、あらかじめ参照ファイルをダウンロードして置けばオフラインでも動作
-  させる事ができる。(
-  [doc/jquery_local.md](https://github.com/kaikoma-soft/raspirec/blob/master/doc/jquery_local.md) を参照 )
+* jquery,Materialize を参照しているので、
+  インターネットにアクセス出来る環境で動作させる事が必要。
+  だたし、あらかじめ参照ファイルをダウンロードして置けばオフラインでも動作させる事ができる。
+  ([doc/jquery_local.md](https://github.com/kaikoma-soft/raspirec/blob/master/doc/jquery_local.md) を参照 )
 
 * セキュリティにはあまり考慮していないので、インターネット側から
   アクセス出来る状態にしないで下さい。
 
-* android(Fire HD10)版のブラウザでは、一部機能が動作しない。
-  ( なぜか firefox と opera では、動作しない箇所が違う。)
 
 ## インストール方法 ( Raspbian buster lite の場合 )
 
@@ -127,7 +120,7 @@ recpt1/recdvb,epgdump を使って TV番組を録画する録画サーバーを�
     * ruby-sass
 
 
-* recpt1
+* recpt1/recdvb
 
   ハードに合わせたドライバーをインストールし、
   コマンドラインから実行して録画出来る事を確認しておく。
@@ -135,7 +128,7 @@ recpt1/recdvb,epgdump を使って TV番組を録画する録画サーバーを�
 * epgdump
 
    epgdump は、同じ名前で仕様の違うものがあるので、
-   必ず https://github.com/Piro77/epgdump を使う。
+   必ず [https://github.com/Piro77/epgdump](https://github.com/Piro77/epgdump) を使う。
 
 * raspirec ( 基本機能のみ、オプション機能は [別紙]({{site.baseurl}}/src/raspirec-option.html)を参照 )
 
@@ -163,6 +156,7 @@ recpt1/recdvb,epgdump を使って TV番組を録画する録画サーバーを�
          GR_EPG_channel    : 地デジ EPG 受信局を設定する。
          GR_tuner_num      : 地デジチュナー数
          BSCS_tuner_num    : BSCSチュナー数
+         GBC_tuner_num     : 地デジ/BS/CS チューナー数
          ```
 
        * configファイルを $HOME/.config 以外の任意の場所に置きたい場合は、
@@ -223,6 +217,10 @@ Docker を使ったテスト環境を用意しましたので、
 + [ソース](https://github.com/kaikoma-soft/docker-raspirec){:target="_blank"}
 + [ドキュメント](https://kaikoma-soft.github.io/src/docker-raspirec.html){:target="_blank"}
 
+## 追加の説明
+  * [hls, mpv モニタ機能の設定方法](./raspirec-option.html) (ver0.5.0 以降)
+  * [パケットチェック機能の説明](./raspirec-packetchk.html) (Ver1.0.0 以降)
+  * [独立GUI mpvモニタ raspirecTV の説明](./raspirec-TV.html) (Ver1.2.0 以降)
 
 ## リンク
 
