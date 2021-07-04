@@ -57,7 +57,7 @@ RmLogoBlurDefault = :unsharp1
 
 
 1. ロゴを採取する TSファイルを用意する。
-1. 上記の TSファイルの解像度を ffprobe で調べる。(下記の赤字 or 太字の部分)
+1. 上記の TSファイルの解像度を ffprobe で調べる。(下記の赤字の部分)
 <pre>
     % ffprobe TSファイル名
     ....
