@@ -116,8 +116,3 @@ config.rb に記述する。
 ```
 RaspirecTV_font = "IPAUIGothic 12"
 ```
-
-## リンク
-
-+ [gitHub raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
-+ [raspirec ドキュメント](https://kaikoma-soft.github.io/src/raspirec.html ){:target="_blank"}
