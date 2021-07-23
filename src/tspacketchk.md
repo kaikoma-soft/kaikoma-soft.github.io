@@ -1,6 +1,4 @@
----
 title: MPEG-2 TS パケット チェック
----
 
 ## tspacketchk とは
 

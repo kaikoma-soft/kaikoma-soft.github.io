@@ -1,11 +1,10 @@
----
 title: raspirecTV
----
 
 
 ## はじめに
 
-ここでは、raspirec のオプション機能で、Ver1.2.0 から導入された
+ここでは、[raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
+のオプション機能で、Ver1.2.0 から導入された
 raspirecTV について説明します。
 
 ## raspirecTV とは
@@ -116,3 +115,8 @@ config.rb に記述する。
 ```
 RaspirecTV_font = "IPAUIGothic 12"
 ```
+
+## リンク
+
++ [gitHub raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
++ [raspirec ドキュメント](https://kaikoma-soft.github.io/src/raspirec.html ){:target="_blank"}
