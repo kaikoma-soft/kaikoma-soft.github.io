@@ -5,7 +5,9 @@ title: raspirecTV
 
 ## はじめに
 
-ここでは、raspirec のオプション機能で、Ver1.2.0 から導入された
+ここでは、
+[raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
+のオプション機能で、Ver1.2.0 から導入された
 raspirecTV について説明します。
 
 ## raspirecTV とは
@@ -23,7 +25,8 @@ raspirec が、正常に稼働している必要があります。
 [![main画面 と mpv画面]({{site.baseurl}}/img/TV.png){: .mmimg}]({{site.baseurl}}/img/TV.png "main画面 と mpv画面")
 
 ## 実行に必要な環境
-* raspirec (Ver1.2.0 以上) 本体が稼働していること。
+* [raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
+  (Ver1.2.0 以上) 本体が稼働していること。
 * mpv 0.32.0 
 * ruby-gtk2 3.2.4
 * リモート表示する場合
