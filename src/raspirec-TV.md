@@ -5,8 +5,7 @@ title: raspirecTV
 
 ## はじめに
 
-ここでは、
-[raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
+ここでは、[raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
 のオプション機能で、Ver1.2.0 から導入された
 raspirecTV について説明します。
 
@@ -25,8 +24,7 @@ raspirec が、正常に稼働している必要があります。
 [![main画面 と mpv画面]({{site.baseurl}}/img/TV.png){: .mmimg}]({{site.baseurl}}/img/TV.png "main画面 と mpv画面")
 
 ## 実行に必要な環境
-* [raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
-  (Ver1.2.0 以上) 本体が稼働していること。
+* raspirec (Ver1.2.0 以上) 本体が稼働していること。
 * mpv 0.32.0 
 * ruby-gtk2 3.2.4
 * リモート表示する場合
@@ -119,3 +117,8 @@ config.rb に記述する。
 ```
 RaspirecTV_font = "IPAUIGothic 12"
 ```
+
+## リンク
+
++ [gitHub raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
++ [raspirec ドキュメント](https://kaikoma-soft.github.io/src/raspirec.html ){:target="_blank"}
