@@ -5,7 +5,7 @@ title: raspirecTV
 
 ## はじめに
 
-ここでは、[raspirec](https://github.com/kaikoma-soft/raspirec ){:target="_blank"}
+ここでは、[raspirec](https://github.com/kaikoma-soft/raspirec )
 のオプション機能で、Ver1.2.0 から導入された
 raspirecTV について説明します。
 
