@@ -1,6 +1,4 @@
----
 title: Linux 系OS上で recpt1/recdvb,epgdump を使って TV番組を録画する録画予約システム
----
 
 
 ## 目的
