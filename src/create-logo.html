@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>補足：logoファイルを作成方法の詳細 | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="補足：logoファイルを作成方法の詳細" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="補足：logoファイルを作成方法の詳細" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"補足：logoファイルを作成方法の詳細","url":"/src/create-logo.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <p>本編ロゴファイルの作成方法は次の通りです。</p>
+
+<!--more-->
+
+<ol>
+  <li>
+    <p>変換対象の TS ファイルを「TS/番組名」ディレクトリの下に置く。</p>
+  </li>
+  <li>
+    <p>cmcuterAll.rb を実行する。 <br />
+この段階では、logoファイルが存在しないので、スクリーンショットと
+ wav ファイルを作業ディレクトリに作っただけで、エラーで止まる。</p>
+  </li>
+  <li>スクリーンショットが保存されたディレクトリを指定して
+logoAnalysisSub.py を実行する。
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% logoAnalysisSub.py <span class="nt">--dir</span> work/番組名/タイトル/SS
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>すると下記の様なスクリーンショット画像が表示される。</p>
+
+    <p><img src="/img/logosub.png" alt="ロゴの表示" /></p>
+
+    <p>上段が元画像。下段は元画像をグレイスケール化＋強調したもの。</p>
+  </li>
+  <li>
+    <p>下記のキー操作を行い下段のロゴマークが明瞭な時点まで移動し、
+画像を保存する。</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>キー</th>
+          <th>意味</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>j</td>
+          <td>60コマ( 30秒)飛ぶ</td>
+        </tr>
+        <tr>
+          <td>k</td>
+          <td>60コマ( 30秒)戻る</td>
+        </tr>
+        <tr>
+          <td>s</td>
+          <td>現在の画像をカレントディレクトリに保存する。</td>
+        </tr>
+        <tr>
+          <td>b</td>
+          <td>前のコマ( 0.5秒)に戻る</td>
+        </tr>
+        <tr>
+          <td>q</td>
+          <td>終了</td>
+        </tr>
+        <tr>
+          <td>上記以外</td>
+          <td>次のコマ( 0.5秒)に進む</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>
+    <p>保存した画像を gimp を使って加工する。(同様な処理が行えるなら他のツールでも可)</p>
+
+    <ol>
+      <li>下部部分のロゴマークを最小限の大きさで矩形領域の切り抜きをする。
+(「ツール」-&gt; 「変形ツール」-&gt; 「切り抜き」)
+<img src="/img/gimp.png" alt="gimp" /></li>
+      <li>「画像」-&gt; 「モード」-&gt; 「グレイスケール」で、グレイスケール化する。</li>
+      <li>logo ディレクトリの下に、画像を保存する。</li>
+    </ol>
+  </li>
+</ol>
+
+<hr />
+<h3 id="cm-ロゴファイルの作成">CM ロゴファイルの作成</h3>
+
+<p>放送局によって自局の番組CM にロゴを入っている事があるが、それが本編のロゴと紛らわしい
+場合がある。</p>
+
+<p><img src="/img/logoC.png" alt="本編ロゴと番宣ロゴ" /></p>
+
+<ul>
+  <li>右側 番宣ロゴ</li>
+  <li>左側 本編ロゴ</li>
+</ul>
+
+<p>その場合は、番宣ロゴを本編ロゴと同様に作成して、:cmlogofn に指定する。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   XXXXX:
+       :logofn: YYYY.png
+       :cmlogofn: YYYY-CM.png
+       :position: top-right
+       :chapNum: 6
+       :duration: 465
+</code></pre></div></div>
+
+<p>なおグレイスケール化した後の形状で区別出来ない場合は、グレイスケール化ぜずにカラーのままでロゴファイルを作成する。
+(ただし、ロゴ解析の実行時間は長くなる。)</p>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( TOP ) | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( TOP )" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( TOP )" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( TOP )","url":"/src/raspi_top.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="背景">背景</h2>
+
+<p>現在使っている PT2 + Windows10 のマシンが老朽化しつつあり、
+またチューナー数の不足を感じていた時に
+Plex社製TVチューナーのドライバーを個人で作成して、
+しかもそれが Raspberry Pi で動く、
+という情報を見たので、
+安価な録画サーバーとして使え無いか試してみました。</p>
+
+<p>ドライバーの作者さんありがとうございます。</p>
+
+<h2 id="目的">目的</h2>
+<p>下記の様な条件の録画サーバーを構築する。</p>
+
+<ul>
+  <li>必要なチューナー数は BS x 3。</li>
+  <li>24時間運転するので、出来るだけ消費電力が低いもの。</li>
+  <li>ACアダプタで FANレス。
+ ( PX-Q3U4 は 爆音の FAN 内蔵だが、バラして撤去する。)</li>
+</ul>
+
+<h2 id="用意するもの">用意するもの</h2>
+
+<ul>
+  <li>Raspberry Pi 3B+ と ACアダプタ</li>
+  <li><a href="https://www.raspberrypi.org">Raspbian 4.14.79-v7+</a></li>
+  <li><a href="http://www.plex-net.co.jp/product/px-q3u4/">PX-Q3U4</a></li>
+  <li><a href="https://github.com/nns779/px4_drv">PX-Q3U4 用のドライバー</a></li>
+  <li>SDカード 16G (SDなしHDDのみの構成は不可だった。後述)</li>
+  <li>SDカードライター</li>
+  <li>外付け USB HDD (お古の TV用 1T)</li>
+  <li>USB カードリーダー</li>
+  <li>作業用のマシン(Linux)</li>
+</ul>
+
+<h2 id="結果">結果</h2>
+
+<ul>
+  <li>BS x 3 はクリア</li>
+  <li>録画ソフトは、epgrec UNA版を選択。</li>
+  <li>余裕があれば mp4変換や、dlnaサーバー、ファイルサーバー
+をやらせようと考えていたが無理。</li>
+  <li>録画した TSファイルは ftp で、作業PCに転送する。
+( scp は暗号化の処理が重いので。)
+転送速度は 19.1Mbyte/秒 程度。</li>
+</ul>
+
+<h2 id="詳細">詳細</h2>
+<ol>
+  <li><a href="/src/raspi_OS_install.html">OS のインストール</a></li>
+  <li><a href="/src/raspi_speedchk.html">性能チェック</a></li>
+  <li><a href="/src/raspi_result.html">試行中間結果</a></li>
+  <li><a href="/src/raspi_result2.html">ドライバ更新結果</a></li>
+</ol>
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

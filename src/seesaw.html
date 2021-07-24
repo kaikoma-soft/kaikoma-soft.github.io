@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Samba と連携して、Samba経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Samba と連携して、Samba経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Samba と連携して、Samba経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"Samba と連携して、Samba経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム","url":"/src/seesaw.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="seesaw-とは">seesaw とは</h2>
+
+<p>本プログラムは,
+Samba と連携して、Samba経由で再生した動画ファイルの
+未視聴／視聴済 を記録し、playList を生成する
+ソフトウェアです。</p>
+
+<h2 id="背景目的">背景・目的</h2>
+
+<p>PC で録画した動画ファイルを、居間の TV に接続した Fire TV stick や、
+タブレットの VLC 等の再生ソフトを使って視聴しているが、
+ファイルが溜まってくると、見た／見ていないの管理が煩わしい。
+（後でBDに保存するので、見たら消す方式は使えない。）
+<br />
+そこで、新規のファイルは「未視聴」に、動画再生すれば自動的に「視聴済」
+に分類される仕組みを作成した。</p>
+
+<!--more-->
+
+<h2 id="動作概要">動作概要</h2>
+
+<ul>
+  <li>視聴する動画ファイルがあるディレクトリ(*1)を指定する。</li>
+  <li>ディレクトリ(*1)検索し、DB に登録する。
+    <ul>
+      <li>新規追加されたファイルは、「未視聴」に分類される。</li>
+      <li>全てのファイルは、「全て」の含まれる</li>
+    </ul>
+  </li>
+  <li>未視聴／視聴済／全て の３つ分類してシンボリックリンク(*2)を生成する。</li>
+  <li>samba のアクセスログを監視し、条件を満たすと「未視聴」「視聴済」が入れ替わる。</li>
+  <li>条件とは、
+    <ul>
+      <li>1分以上再生する。(config.rb で変更可) ただし猶予期間中に再度再生開始するとキャンセルされる。</li>
+      <li>1分以内に、2秒以上の再生を2回繰り返す。</li>
+    </ul>
+  </li>
+  <li>視聴する動画があるディレクトリのイメージ (*1)
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  ├── 番組A
+  │     ├── 番組A #01.mp4
+  │     ├── 番組A #02.mp4
+  │     └── 番組A #03.mp4
+  └── 番組B
+         ├── 番組B #01.mp4
+         └── 番組B #02.mp4
+</code></pre></div>    </div>
+  </li>
+  <li>seesaw が生成するシンボリックリンク群のイメージ(*2)
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  ├── 視聴済
+  │     ├── 番組A
+  │     │     └── 番組A #01.mp4
+  │     └── 番組B
+  │            └── 番組B #01.mp4
+  ├── 全て
+  │     ├── 番組A
+  │     │     ├── 番組A #01.mp4
+  │     │     ├── 番組A #02.mp4
+  │     │     └── 番組A #03.mp4
+  │     └── 番組B
+  │            ├── 番組B #01.mp4
+  │            └── 番組B #02.mp4
+  └── 未視聴
+         ├── 番組A
+         │     ├── 番組A #02.mp4
+         │     └── 番組A #03.mp4
+         └── 番組B
+                └── 番組B #02.mp4
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="プログラム構成図">プログラム構成図</h2>
+
+<p><a href="/img/seesaw_diagram.png"><img src="/img/seesaw_diagram.png" alt="" class="ssimg" /></a></p>
+
+<h2 id="インストール方法">インストール方法</h2>
+
+<h3 id="seesaw-その１">seesaw (その１)</h3>
+
+<ul>
+  <li>必要なパッケージを apt install でインストールする。
+    <ul>
+      <li>git</li>
+      <li>ruby</li>
+      <li>samba</li>
+      <li>ruby-sqlite3</li>
+    </ul>
+  </li>
+  <li>
+    <p>インストールするディレクトリに移動し,</p>
+
+    <p><code class="language-plaintext highlighter-rouge">% git clone https://github.com/kaikoma-soft/seesaw.git</code></p>
+  </li>
+  <li>
+    <p>出力先のディレクトリを作成し、次項の config.rb の BaseDir に設定する。</p>
+
+    <p><code class="language-plaintext highlighter-rouge">% mkdir -p /data/seesaw</code></p>
+  </li>
+  <li>config.sample を $HOME/.config/seesaw/config.rb にコピーして、
+環境に合わせて値を変更する。</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th>定数名</th>
+      <th>意味</th>
+      <th>備考</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>BaseDir</td>
+      <td>seesaw が出力するディレクトリ</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>SambaLog</td>
+      <td>samba のアクセスログファイル名</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>TargetDir</td>
+      <td>録画ファイルがあるディレクトリ</td>
+      <td>複数可</td>
+    </tr>
+    <tr>
+      <td>TargetExt</td>
+      <td>対象とするファイルの拡張子</td>
+      <td>複数可</td>
+    </tr>
+    <tr>
+      <td>Exclude</td>
+      <td>除外するファイル,ディレクトリの正規表現</td>
+      <td>複数可,ファイル名可</td>
+    </tr>
+    <tr>
+      <td>RefreshPeriod</td>
+      <td>TargetDirの検索周期(秒)</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>DoneTime</td>
+      <td>視聴済にする再生時間(秒)</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>FlipDelay</td>
+      <td>反転処理までの遅延時間(秒)</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>LogRotateSize</td>
+      <td>log ローテーションサイズ(byte)</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>
+    <p>動作確認の為テスト実行する。
+エラーメッセージが出なければ Ctrl-C で中止</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> % sudo touch /var/log/smb_acc.log
+ % ruby seesaw.rb
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="samba">samba</h3>
+
+<ul>
+  <li>
+    <p>/etc/samba/smb.conf に下記の項を追加する。
+path には、<code class="language-plaintext highlighter-rouge">${BaseDir}/playlist</code> を設定する。</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[global]
+  wide links = yes
+  unix extensions  = no
+[seesaw]
+  path = /data/seesaw/playlist
+  public = no
+  vfs objects = full_audit
+  full_audit:prefix = %T|%u
+  full_audit:success = open close
+  full_audit:failure = none
+  full_audit:facility = LOCAL7
+  full_audit:priority = NOTICE
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>変更後にリスタート
+  <code class="language-plaintext highlighter-rouge">% sudo systemctl restart smbd</code></p>
+  </li>
+</ul>
+
+<h3 id="syslog">syslog</h3>
+<ul>
+  <li>
+    <p>/etc/rsyslog.d/50-samba.conf を下記の内容で、新規作成する。</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>local7.*                        -/var/log/smb_acc.log
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>変更後にリスタート
+<code class="language-plaintext highlighter-rouge">% sudo systemctl restart syslog</code></p>
+  </li>
+  <li>
+    <p>samba 上のファイルにアクセスして、アクセスログに出力される事を確認する。</p>
+  </li>
+</ul>
+
+<h3 id="seesaw-その2">seesaw (その2)</h3>
+
+<ul>
+  <li>
+    <p>seesaw をバックグラウンドで、実行する。</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> % ruby seesaw.rb -b 
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>OS のリブート時に、起動したい場合は crontab に下記を記述する。</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> @reboot /usr/bin/ruby /home/xxx/yyy/seesaw.rb -b
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="オプションの説明">オプションの説明</h2>
+
+<h5 id="-b-background">-b, –background</h5>
+
+<p>バックグラウンドで実行する。</p>
+
+<h5 id="done-str">–done str</h5>
+
+<p>str を正規表現として、一致するファイルを視聴済にする。<br />
+例:  <code class="language-plaintext highlighter-rouge">ruby seesar.rb --done ニュース</code></p>
+
+<h5 id="notyet-str">–notyet str</h5>
+<p>str を正規表現として、一致するファイルを未視聴にする。<br />
+例:  <code class="language-plaintext highlighter-rouge">ruby seesar.rb --notyet ニュース</code></p>
+
+<h5 id="-t">-t</h5>
+<p>–notyet/done の時に test mode(表示のみ)にする。</p>
+
+<h5 id="-k-kill">-k, –kill</h5>
+<p>バックグラウンドで、動いているseesaw を停止させる。</p>
+
+<h5 id="-l-loglevel-n">-l, –loglevel n</h5>
+<p>log に出力するレベルを指定する。n = 0〜5 でデフォルトは 1</p>
+
+<h5 id="-r-reload">-r, –reload</h5>
+<p>データの再検索を行う。</p>
+
+<h2 id="状態遷移の動作説明">状態遷移の動作説明</h2>
+
+<p>samba で共有された動画ファイルに対して、次の操作をした場合に状態遷移が起きる。
+<br />
+なお操作２は、操作1の終了から FlipDelay で指定した秒数以内で行う操作のこと。</p>
+
+<ul>
+  <li>Long再生 : DoneTime で指定した秒数以上の再生</li>
+  <li>Shrot再生 : 2秒以上、DoneTime で指定した秒数未満の再生</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th>操作1</th>
+      <th>操作2</th>
+      <th>動作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Long再生</td>
+      <td>なし</td>
+      <td>未&lt;-&gt;済 の入れ替え</td>
+    </tr>
+    <tr>
+      <td>Long再生</td>
+      <td>Short再生</td>
+      <td>なし(キャンセル)</td>
+    </tr>
+    <tr>
+      <td>Long再生</td>
+      <td>Long再生</td>
+      <td>なし(操作1のキャンセル)</td>
+    </tr>
+    <tr>
+      <td>Short再生</td>
+      <td>なし</td>
+      <td>なし</td>
+    </tr>
+    <tr>
+      <td>Short再生</td>
+      <td>Short再生</td>
+      <td>未&lt;-&gt;済 の入れ替え</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="動作確認環境">動作確認環境</h2>
+
+<p>サーバー側</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>マシン</th>
+      <th>OS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>PC</td>
+      <td>Ubuntu 18.04.3 LTS</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>クライアント側</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>マシン</th>
+      <th>再生ソフト</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Fire HD 10</td>
+      <td>VLC for Android Ver 3.2.6</td>
+    </tr>
+    <tr>
+      <td>Fire TV stick</td>
+      <td>VLC for Android Ver 3.1.4</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="連絡先">連絡先</h2>
+
+<p>不具合報告などは、
+<a href="https://github.com/kaikoma-soft/seesaw/issues">GitHub issuse</a>
+の方にお願いします。</p>
+
+<h2 id="リンク">リンク</h2>
+
+<ul>
+  <li><a href="http://www.asahi-net.or.jp/~sy8y-siy/src/seesaw.html" target="_blank">ナマケモノの家 seesaw</a></li>
+  <li><a href="https://github.com/kaikoma-soft/seesaw" target="_blank">gitHub seesaw</a></li>
+  <li><a href="https://kaikoma-soft.github.io/src/seesaw.html" target="_blank">gitHub Pages seesaw</a></li>
+</ul>
+
+<h2 id="ライセンス">ライセンス</h2>
+<p>このソフトウェアは、Apache License Version 2.0 ライセンスのも
+とで公開します。詳しくは LICENSE を見て下さい。</p>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

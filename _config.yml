@@ -1,9 +1,0 @@
-theme: jekyll-theme-dinky
-plugins:
-  - jekyll-sitemap
-google_analytics: UA-172437629-1
-
-github:
-  owner_url:  https://kaikoma-soft.github.io/index.html
-  owner_name: GitHub Page Home
-

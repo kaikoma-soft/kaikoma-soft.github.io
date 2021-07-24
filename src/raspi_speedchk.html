@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( 性能チェック ) | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( 性能チェック )" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( 性能チェック )" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( 性能チェック )","url":"/src/raspi_speedchk.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="目的">目的</h2>
+<p>Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバーを構築するために必要な能力があるか
+チェックする。</p>
+
+<h2 id="条件">条件</h2>
+
+<table>
+  <tbody>
+    <tr>
+      <td>マシン</td>
+      <td>Raspberry Pi 3B+</td>
+    </tr>
+    <tr>
+      <td>OS</td>
+      <td><a href="https://www.raspberrypi.org">Raspbian 4.14.79-v7+</a></td>
+    </tr>
+    <tr>
+      <td>チューナー</td>
+      <td><a href="http://www.plex-net.co.jp/product/px-q3u4/">PX-Q3U4</a></td>
+    </tr>
+    <tr>
+      <td>ドライバー</td>
+      <td><a href="https://github.com/nns779/px4_drv">PX-Q3U4 用のドライバー</a></td>
+    </tr>
+    <tr>
+      <td>HDD</td>
+      <td>USB HDD 1TB。 dd での書き込み速度は 53.3 MB/s 程度</td>
+    </tr>
+    <tr>
+      <td>作業PC</td>
+      <td>Ubuntu 18.04.1 LTS i5-3570 3.40GHz</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+<h2 id="テスト-その１">テスト その１</h2>
+
+<ol>
+  <li>recpt1 で 30分間録画をストリーム数だけ並列で実行する。
+( コマンドは recpt1 –b25 Ch 1800 TSファイル名 )</li>
+  <li>録画終了後 tsselect を実行し drop数をカウントする。
+ただしカウントは、パケット数の上位 10 番目までの PID に限定する。</li>
+</ol>
+
+<p>結果</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>ストリーム数</th>
+      <th>データ量</th>
+      <th>drop数</th>
+      <th>参考(作業PCでのdrop数)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>BS ×1</td>
+      <td>5.1GB</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>BS ×2</td>
+      <td>10.2GB</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>BS ×3</td>
+      <td>15.3GB</td>
+      <td>8</td>
+      <td>14</td>
+    </tr>
+    <tr>
+      <td>BS ×4</td>
+      <td>20.5GB</td>
+      <td>46</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>地デジ×1</td>
+      <td>3.7GB</td>
+      <td>0</td>
+      <td>23</td>
+    </tr>
+    <tr>
+      <td>地デジ×2</td>
+      <td>7.4GB</td>
+      <td>153</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <td>地デジ×3</td>
+      <td>11.1GB</td>
+      <td>0</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <td>地デジ×4</td>
+      <td>14.8GB</td>
+      <td>212</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>BS×2, 地デジ ×2</td>
+      <td>17.6GB</td>
+      <td>0</td>
+      <td>26</td>
+    </tr>
+    <tr>
+      <td>BS×3, 地デジ ×2</td>
+      <td>22.7GB</td>
+      <td>53525</td>
+      <td>4069</td>
+    </tr>
+    <tr>
+      <td>BS×3, 地デジ ×3</td>
+      <td>25.5GB</td>
+      <td>90080</td>
+      <td>530</td>
+    </tr>
+    <tr>
+      <td>BS×4, 地デジ ×3</td>
+      <td>20.7GB</td>
+      <td>563133</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <td>BS×4, 地デジ ×4</td>
+      <td>18.8GB</td>
+      <td>439943</td>
+      <td>394</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>
+    <p>目標である BS ×3 は、ギリギリでクリアとする。</p>
+  </li>
+  <li>
+    <p>地デジで drop 数が多いのは電波状況の為？</p>
+  </li>
+  <li>
+    <p>recpt1 1個あたりのCPU負荷は RasPi で 20〜25% だが、
+ ロードアベレージが、 BS×4, 地デジ ×4 では 9〜10 になり、
+ CPUは余っているのに過負荷になっている。(4コアなので MAX は 400% )</p>
+  </li>
+  <li>
+    <p>作業PC(Ubuntu) に Plex社製のドライバーでも同じような傾向だったので、
+元のドライバーが悪いのか。</p>
+  </li>
+</ul>
+
+<hr />
+<h2 id="テスト-その２">テスト その２</h2>
+
+<p>mirakurun + EPGStation をインストールし、BS×3 を 30分間録画し
+drop 数をカウントする。</p>
+
+<p>結果</p>
+
+<p>drop数は 10345 + 62 +  2023 = 12430</p>
+
+<p>top で CPU負荷状況をみると Mirakurun が 100% 以上となって過負荷になって、
+ データを処理しきれなくなっている。(RasPi には荷が重い。)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND    
+  748 root      10 -10  256916 145260   6660 R 107.6 15.3  16:07.67 Mirakurun:+
+  918 shiiya    20   0  222872 100384   6760 S  14.2 10.6   0:20.79 node       
+ 1800 root      10 -10  105028  75252    208 D   9.9  7.9   0:09.03 recpt1     
+ 1798 root      10 -10  135892 106456    212 D   9.6 11.2   0:11.40 recpt1     
+ 1799 root      10 -10  159980 130552    236 D   7.3 13.8   0:10.69 recpt1     
+  729 root      20   0  142432  28052   6220 S   2.0  3.0   0:17.08 PM2 v3.2.4+
+</code></pre></div></div>
+
+<hr />
+<h2 id="テスト-その３">テスト その３</h2>
+
+<p>epgrec UNA版 をインストールして、BS×3 を 30分間録画して、
+drop 数をカウントする。</p>
+
+<p>結果</p>
+
+<p>drop 0 + 0 + 0 = 0</p>
+
+<hr />
+<h2 id="録画ソフトの選択">録画ソフトの選択</h2>
+
+<p>以上の結果から録画ソフトの選択は、下記のようになった。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>名前</th>
+      <th>判定</th>
+      <th>コメント</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>mirakurun + EPGStation</td>
+      <td>×</td>
+      <td>3TS では Mirakurun が RasPi には荷が重い。</td>
+    </tr>
+    <tr>
+      <td>mirakurun + chinachu γ</td>
+      <td>×</td>
+      <td>未テストだが、上と同じ筈</td>
+    </tr>
+    <tr>
+      <td>chinachu β</td>
+      <td>×</td>
+      <td>armはサポート外でインストール出来ず。</td>
+    </tr>
+    <tr>
+      <td>epgrec UNA版</td>
+      <td>△</td>
+      <td>動くが、機能的に不足な所がある。</td>
+    </tr>
+    <tr>
+      <td>epgrec STZ版</td>
+      <td>×</td>
+      <td>php7 では、動かない</td>
+    </tr>
+    <tr>
+      <td>epgrec 本家</td>
+      <td>×</td>
+      <td>同上</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>epgrec UNA版で運用する。</li>
+  <li>Raspberry Pi でも動く、軽い録画ソフトが欲しい。
+( → 2019/11/09 追記: <a href="/src/raspirec.html">作りました。</a> )</li>
+</ul>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
