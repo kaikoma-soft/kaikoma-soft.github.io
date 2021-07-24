@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>MPEG-2 TS パケット チェック | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="MPEG-2 TS パケット チェック" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MPEG-2 TS パケット チェック" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"MPEG-2 TS パケット チェック","url":"/src/tspacketchk.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="tspacketchk-とは">tspacketchk とは</h2>
+
+<p>本プログラムは,
+MPEG-2 TS パケットの健全性をチェックするものです。</p>
+
+<h2 id="特徴">特徴</h2>
+
+<ul>
+  <li>オリジナルは tsselect で、それのチェック機能の部分を抜き出して改造、機能追加したもの。</li>
+  <li>オリジナルとは下記のような違いがある。
+    <ul>
+      <li>結果の表示を見やすく。</li>
+      <li>drop、error 等が発生した時刻を表示。</li>
+      <li>録画開始直後の不安定な期間を無視することが可能。(-s オプション)</li>
+      <li>PCR Wrap-around check の追加。(-P オプション)</li>
+      <li>drop,errorのカウント方法が違うので、結果の数字は異なる場合がある。</li>
+    </ul>
+  </li>
+</ul>
+
+<!--more-->
+
+<h2 id="インストール方法">インストール方法</h2>
+<p>下記で /usr/local/bin/tspacketchk にインストールします。</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   % mkdir /tmp/tspacketchk
+   % cd /tmp/tspacketchk
+   % git clone https://github.com/kaikoma-soft/tspacketchk.git .
+   % make
+   % sudo make install
+</code></pre></div></div>
+
+<h2 id="実行方法">実行方法</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  % tspacketchk [オプション]... TSファイル...
+</code></pre></div></div>
+
+<h2 id="オプションの説明">オプションの説明</h2>
+
+<h5 id="-l-limit-n">-l, –limit n</h5>
+<p>詳細表示の行数を n行にする。デフォルトは 16</p>
+
+<h5 id="-s-skip-n">-s, –skip n</h5>
+<p>開始直後の n秒はエラーを無視する</p>
+
+<h5 id="-p-progress">-p, –progress</h5>
+<p>進捗状況の表示</p>
+
+<h5 id="-p-pcr">-P, –PCR</h5>
+<p>PCR Wrap-around check の追加</p>
+
+<h5 id="-h-help">-h, –help</h5>
+<p>この使い方を表示して終了する</p>
+
+<h2 id="実行結果の例">実行結果の例</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;&lt;&lt; test.ts &gt;&gt;&gt;
+
+  No  Time          packetNo  pid     type        
+   1  00:00:00.00        144  0x0110  error       
+   2  00:00:00.00        159  0x0110  drop (7 != 6)
+   3  00:00:00.17       1647  0x01f0  drop (5 != 6)
+   4  00:02:54.13    1601939  0x0100  error       
+   5  00:02:54.13    1601940  0x0100  error       
+   6  00:02:54.13    1601941  0x0100  error       
+   7  00:02:54.13    1601943  0x0100  error       
+   8  00:02:54.13    1601944  0x0100  error       
+   9  00:02:54.13    1601948  0x0100  error       
+  10  00:02:54.13    1601949  0x0100  error       
+  11  00:02:54.13    1601950  0x0100  error       
+  12  00:02:54.13    1601951  0x0100  error       
+  13  00:02:54.13    1601952  0x0100  error       
+  14  00:02:54.13    1601953  0x0100  error       
+  15  00:02:54.13    1601954  0x0100  error       
+  16  00:02:54.13    1601955  0x0100  error       
+...
+
+   pid      packets         drop        error   scrambling
+-----------------------------------------------------------
+0x0000         2961            0            0            0
+0x0011            6            0            0            0
+0x0012          926            0            0            0
+0x0100      2629336            1          796          778
+0x0110        56928            2           21           20
+0x0130           13            0            0            0
+0x0138          294            0            0            0
+0x01f0         5888            2            3            1
+0x01ff         5098            0            3            0
+0x0300            1            0            1            0
+0x0901         2948            0            2            1
+-----------------------------------------------------------
+            2704399            5          826          800
+
+            drop+error = 831
+         syncbyte lost = 1
+ PCR Wrap-around check = OK          (start=24:13:08.30, end=24:18:03.08)
+              duration = 00:04:54.77 (2704399 packets, 508427286 byte)
+            Check Time = 0.1 sec     (3767.12 Mbyte/sec)
+</code></pre></div></div>
+
+<h3 id="説明">説明</h3>
+
+<h4 id="drop">drop</h4>
+<p>巡回カウンターが連続しなかった場合にカウント。
+(失われたパケット数ではなく不連続が生じた回数)</p>
+<h4 id="error">error</h4>
+<p>TSヘッダー部の transport_error_indicator ビットがセットされていた場合にカウント。</p>
+<h4 id="scrambling">scrambling</h4>
+<p>TSヘッダー部の transport_scrambling_control ビットがセットされていた場合に
+カウント。<br />
+B25 デコード前ならば、カウントされるのが正常。<br />
+B25 デコード後ならば、カウントされないのが正常。</p>
+
+<h4 id="syncbyte-lost">syncbyte lost</h4>
+<p>同期バイト(0x47) を見失った回数</p>
+
+<h4 id="pcr-wrap-around-check">PCR Wrap-around check</h4>
+<p>PCR（Program Clock Reference）の値が スタート時 &lt; 終了時 の場合に OK
+<br />
+そうでない場合に NG とする。( PCR は 26.5H で一周する )
+<br />
+NG の場合、一部のツールで上手く扱えない可能性がある。(最近はそうでもない？)</p>
+
+<h2 id="動作確認環境">動作確認環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>マシン</th>
+      <th>OS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>PC</td>
+      <td>Ubuntu 20.04.2 LTS (64bit)</td>
+    </tr>
+    <tr>
+      <td>raspberry pi 3B+</td>
+      <td>Raspbian GNU/Linux 9 (stretch) (32bit)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="連絡先">連絡先</h2>
+
+<p>不具合報告などは、
+<a href="https://github.com/kaikoma-soft/tspacketchk/issues">GitHub issuse</a>
+の方にお願いします。</p>
+
+<h2 id="ライセンス">ライセンス</h2>
+<p>このソフトウェアは、Apache License Version 2.0 ライセンスのも
+とで公開します。詳しくは LICENSE を見て下さい。</p>
+
+<h2 id="リンク">リンク</h2>
+
+<ul>
+  <li><a href="https://github.com/kaikoma-soft/tspacketchk" target="_blank">gitHub tspacketchk</a></li>
+  <li><a href="https://kaikoma-soft.github.io/src/tspacketchk.html" target="_blank">gitHub Pages tspacketchk</a></li>
+</ul>
+
+<h2 id="謝辞">謝辞</h2>
+
+<p>このソフトウェアは、
+ tsselect ( http://www.marumo.ne.jp/junk/tsselect-0.1.8.lzh )
+を基に、作成したものです。<br />
+ソースコードの利用を許可して頂き、ありがとうございました。</p>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

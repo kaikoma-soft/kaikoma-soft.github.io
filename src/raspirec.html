@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Linux 系OS上で recpt1/recdvb,epgdump を使って TV番組を録画する録画予約システム | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Linux 系OS上で recpt1/recdvb,epgdump を使って TV番組を録画する録画予約システム" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Linux 系OS上で recpt1/recdvb,epgdump を使って TV番組を録画する録画予約システム" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"Linux 系OS上で recpt1/recdvb,epgdump を使って TV番組を録画する録画予約システム","url":"/src/raspirec.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="目的">目的</h2>
+
+<p>本プログラム(raspirec) は Linux 系OS上で、
+recpt1/recdvb,epgdump を使って TV番組を録画する録画サーバーを構築するための
+録画予約システムです。
+<br />
+特に、ラズパイのようなシングルボードコンピュータ(SBC)で動作させる事に最適化しています。</p>
+
+<p>なお動作には recpt1/recdvb に対応しているドライバーがあるTVチューナー
+( アースソフト社製 PT1〜3, PLEX社製 PX-W3U4、PX-W3PE4、PX-Q3U4、PX-Q3PE4 等)
+が必要です。</p>
+
+<table>
+    <tr>
+      <th> チューナーカード名</th>
+      <th> ドライバー  </th>
+      <th> デバイスファイル </th>
+      <th> 録画コマンド </th>
+    </tr>
+    <tr>
+      <td> PT1, PT2 </td>
+      <td> pt1_drv </td>
+      <td> /dev/pt1video0 </td>
+      <td rowspan="3"> recpt1 </td>
+    </tr>
+    <tr>
+      <td> PT3 </td>
+      <td> pt3_drv </td>
+      <td> /dev/pt3video0 </td>
+    </tr>
+    <tr>
+      <td> Plex社製 PX-Q3U4 等</td>
+      <td> px4_drv </td>
+      <td> /dev/px4video0 </td>
+    </tr>
+    <tr>
+      <td> PT1, PT2, PT3 </td>
+      <td> earth_pt1,earth_pt3 </td>
+      <td> /dev/dvb/adapter0/frontend0 </td>
+      <td> recdvb *1</td>
+    </tr>
+  </table>
+<p>*1 : recdvb は本家のものではなく <a href="https://github.com/kaikoma-soft/recdvb">recpt1互換の recdvb</a> を使用します。</p>
+
+<h2 id="特徴">特徴</h2>
+
+<ul>
+  <li>Raspberry Pi のようなシングルボードコンピュータ(SBC)でも実行できるように、
+機能はシンプルで小型、軽量。</li>
+  <li>処理能力の低いPCでも動作するように最適化。</li>
+  <li>同時録画本数を多くする為に録画中はなるべく負荷を掛けない。
+(raspbery Pi 3B+ で 6本までは確認)</li>
+  <li>インストールが容易</li>
+  <li>WEBインターフェースで、EPG番組表から録画予約が可能。</li>
+  <li>条件検索を設定することで、自動予約登録が可能。</li>
+  <li>録画したTSファイルを、親機にコピーする機能</li>
+  <li>チューナーの数とは別に、同時録画の本数で制限を掛ける事が可能。
+(SBCの場合、能力不足により本数制限が必要になる。)</li>
+  <li>Ver1.1.0 から PX-MLT8PE のような 3波(地デジ/BS/CS)チューナーも使用可</li>
+  <li>Ver1.2.0 から 独立した GUIで「mpv モニタ機能」が使える raspirecTV をリリース</li>
+</ul>
+
+<!--more-->
+
+<h2 id="スクリーンショット">スクリーンショット</h2>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Top画面 <br /> <a href="/img/top.png"><img src="/img/top.png" alt="" class="ssimg" /></a></td>
+      <td>番組表<br /> <a href="/img/prg_tbl.png"><img src="/img/prg_tbl.png" alt="" class="ssimg" /></a></td>
+      <td>予約状況表 <br /> <a href="/img/rsv_tbl.png"><img src="/img/rsv_tbl.png" alt="" class="ssimg" /></a></td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <tr>
+      <td>番組検索 <br />  <a href="/img/search.png"><img src="/img/search.png" alt="" class="ssimg" /></a></td>
+      <td>mpvモニタ(1) <br /> <a href="/img/mpv2.png"><img src="/img/mpv2.png" alt="" class="ssimg" /></a></td>
+      <td>mpvモニタ(2) <br /> <a href="/img/mpv.png"><img src="/img/mpv.png" alt="" class="ssimg" /></a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>* mpvモニタ(2)は raspbery Pi 3B+ に接続された PX-Q3U4 の映像を親機のdesktopに表示</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>hlsモニタ <br />  <a href="/img/hls.png"><img src="/img/hls.png" alt="" class="ssimg" /></a></td>
+      <td>raspirecTV <br /> <a href="/img/TV2.png"><img src="/img/TV2.png" alt="" class="ssimg" /></a></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="実行に必要な環境">実行に必要な環境</h2>
+
+<ul>
+  <li>Linux系 OSが稼働するPC と OS (ドライバーさえあれば UNIX系なら何でも可)</li>
+  <li>ruby  2.5 以上</li>
+  <li>sqlite3</li>
+  <li>TVチューナー ( recpt1/recdvb のドライバーが存在するもの )</li>
+  <li>recpt1 ( <a href="https://github.com/stz2012/recpt1">https://github.com/stz2012/recpt1</a>  )
+又は recdvb ( <a href="https://github.com/kaikoma-soft/recdvb">https://github.com/kaikoma-soft/recdvb</a> ) を推奨</li>
+  <li>epgdump ( https://github.com/Piro77/epgdump を推奨 )</li>
+  <li>もし b25 デコードするなら b25 ライブラリ + カードリーダー</li>
+</ul>
+
+<h2 id="制限事項">制限事項</h2>
+
+<ul>
+  <li>
+    <p>jquery,Materialize を参照しているので、
+インターネットにアクセス出来る環境で動作させる事が必要。
+だたし、あらかじめ参照ファイルをダウンロードして置けばオフラインでも動作させる事ができる。
+(<a href="https://github.com/kaikoma-soft/raspirec/blob/master/doc/jquery_local.md">doc/jquery_local.md</a> を参照 )</p>
+  </li>
+  <li>
+    <p>セキュリティにはあまり考慮していないので、インターネット側から
+アクセス出来る状態にしないで下さい。</p>
+  </li>
+</ul>
+
+<h2 id="インストール方法--raspbian-buster-lite-の場合-">インストール方法 ( Raspbian buster lite の場合 )</h2>
+
+<ul>
+  <li>
+    <p>インストールに必要な下記のパッケージを apt install で インストールする。</p>
+
+    <ul>
+      <li>git</li>
+      <li>autoconf</li>
+      <li>raspberrypi-kernel-headers</li>
+      <li>dkms</li>
+      <li>cmake</li>
+      <li>sqlite3</li>
+      <li>ruby</li>
+      <li>ruby-sqlite3</li>
+      <li>ruby-sys-filesystem</li>
+      <li>ruby-net-ssh</li>
+      <li>ruby-sinatra</li>
+      <li>ruby-slim</li>
+      <li>ruby-sass</li>
+    </ul>
+  </li>
+  <li>
+    <p>recpt1/recdvb</p>
+
+    <p>ハードに合わせたドライバーをインストールし、
+コマンドラインから実行して録画出来る事を確認しておく。</p>
+  </li>
+  <li>
+    <p>epgdump</p>
+
+    <p>epgdump は、同じ名前で仕様の違うものがあるので、
+ 必ず <a href="https://github.com/Piro77/epgdump">https://github.com/Piro77/epgdump</a> を使う。</p>
+  </li>
+  <li>
+    <p>raspirec ( 基本機能のみ、オプション機能は <a href="/src/raspirec-option.html">別紙</a>を参照 )</p>
+
+    <ol>
+      <li>
+        <p>インストールするディレクトリに移動して</p>
+
+        <p><code class="language-plaintext highlighter-rouge">% git clone https://github.com/kaikoma-soft/raspirec.git</code></p>
+
+        <p>すると raspirec というディレクトリが出来るので、
+それを以下 $BaseDir とする。</p>
+      </li>
+      <li>
+        <p>環境に合わせて configファイルをカスタマイズ</p>
+
+        <ul>
+          <li>
+            <p>雛形の config.rb.sample を $HOME/.config/raspirec/config.rb にコピー</p>
+          </li>
+          <li>
+            <p>コピーした config.rb をテキストエディタを使って、
+自分の環境に合わせるように修正する。
+とりあえず最低限必須なのは次のもの。詳細は
+<a href="https://github.com/kaikoma-soft/raspirec/blob/master/doc/config.md">doc/config.md</a> を参照</p>
+
+            <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Recpt1_cmd        : recpt1 コマンドの path を指定する。
+Epgdump           : epgdump コマンドの path を指定する。
+BaseDir           : raspirec がインストールされているディレクトリを設定する。 ( raspirec.rb があるディレクトリ )
+DataDir           : データベースや録画したファイルの置き場所を指定する。
+GR_EPG_channel    : 地デジ EPG 受信局を設定する。
+GR_tuner_num      : 地デジチュナー数
+BSCS_tuner_num    : BSCSチュナー数
+GBC_tuner_num     : 地デジ/BS/CS チューナー数
+</code></pre></div>            </div>
+          </li>
+          <li>
+            <p>configファイルを $HOME/.config 以外の任意の場所に置きたい場合は、
+環境変数 RASPIREC_CONF に絶対パスで指定して下さい。</p>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>テスト実行</p>
+
+        <p><code class="language-plaintext highlighter-rouge">% ruby ${BaseDir}/raspirec.rb -f</code></p>
+
+        <p>一度フォアグラウンドで実行し、エラーが出ない事を確認する。
+エラーメッセージがでなければ、Ctrl-C で中止する。</p>
+      </li>
+    </ol>
+  </li>
+  <li>
+    <p>実行方法</p>
+
+    <p><code class="language-plaintext highlighter-rouge">% ruby ${BaseDir}/raspirec.rb</code></p>
+
+    <p>でデーモンモードで起動する。
+<br />
+すぐに終了するが、バックグラウンドでサービスは走っているので、
+WEBブラウザ で http://ホスト名:4567/ でアクセスする。
+( ポート番号の 4567はデフォルトの値で、config で変更可)</p>
+
+    <p>なお、OS の boot時に、自動で起動させたい場合は crontab に</p>
+
+    <p><code class="language-plaintext highlighter-rouge">@reboot /usr/bin/ruby ${BaseDir}/raspirec.rb</code></p>
+
+    <p>を記述する。</p>
+  </li>
+  <li>
+    <p>停止方法</p>
+
+    <p><code class="language-plaintext highlighter-rouge">% ruby ${BaseDir}/raspirec.rb --kill</code></p>
+
+    <p>で、デーモンが停止する。</p>
+  </li>
+</ul>
+
+<h2 id="アンインストール方法">アンインストール方法</h2>
+
+<ul>
+  <li>ディレクトリ BaseDir, DataDir 以下のファイルを削除</li>
+  <li>インストールしたパッケージを apt remove で削除</li>
+</ul>
+
+<h2 id="動作確認環境">動作確認環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>その１</th>
+      <th>その２</th>
+      <th>その３</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>機種</td>
+      <td>raspberry pi 3B+</td>
+      <td>AMD Ryzen 7 2700 + MEM 16G</td>
+      <td>←</td>
+    </tr>
+    <tr>
+      <td>OS</td>
+      <td>Raspbian Stretch</td>
+      <td>Ubuntu 20.04.2 LTS</td>
+      <td>←</td>
+    </tr>
+    <tr>
+      <td>TVチューナー</td>
+      <td>PX-Q3U4</td>
+      <td>PT2</td>
+      <td>←</td>
+    </tr>
+    <tr>
+      <td>ドライバー</td>
+      <td>px4_drv</td>
+      <td>pt1_drv</td>
+      <td>earth_pt1</td>
+    </tr>
+    <tr>
+      <td>録画ソフト</td>
+      <td>recpt1</td>
+      <td>recpt1</td>
+      <td>recdvb</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="docker-を使ったテスト環境">Docker を使ったテスト環境</h2>
+
+<p>Docker を使ったテスト環境を用意しましたので、
+簡単に動作テストをする事が出来ます。</p>
+<ul>
+  <li><a href="https://github.com/kaikoma-soft/docker-raspirec" target="_blank">ソース</a></li>
+  <li><a href="https://kaikoma-soft.github.io/src/docker-raspirec.html" target="_blank">ドキュメント</a></li>
+</ul>
+
+<h2 id="追加の説明">追加の説明</h2>
+<ul>
+  <li><a href="./raspirec-option.html">hls, mpv モニタ機能の設定方法</a> (ver0.5.0 以降)</li>
+  <li><a href="./raspirec-packetchk.html">パケットチェック機能の説明</a> (Ver1.0.0 以降)</li>
+  <li><a href="./raspirec-TV.html">独立GUI mpvモニタ raspirecTV の説明</a> (Ver1.2.0 以降)</li>
+</ul>
+
+<h2 id="リンク">リンク</h2>
+
+<ul>
+  <li><a href="https://github.com/stz2012/recpt1" target="_blank">recpt1</a></li>
+  <li><a href="https://github.com/kaikoma-soft/recdvb" target="_blank">recdvb</a></li>
+  <li><a href="https://github.com/Piro77/epgdump" target="_blank">epgdump</a></li>
+  <li><a href="https://github.com/nns779/px4_drv" target="_blank">px4_drv</a></li>
+  <li><a href="http://www.plex-net.co.jp/download/" target="_blank">PLEX社 Linux用ドライバー</a></li>
+  <li><a href="http://www.asahi-net.or.jp/~sy8y-siy/src/raspirec.html" target="_blank">ナマケモノの家 raspirec</a></li>
+  <li><a href="https://github.com/kaikoma-soft/raspirec" target="_blank">gitHub raspirec</a></li>
+  <li><a href="https://kaikoma-soft.github.io/src/raspirec.html" target="_blank">gitHub Pages raspirec</a></li>
+</ul>
+
+<h2 id="不具合報告">不具合報告</h2>
+
+<p>不具合報告等は、<a href="https://github.com/kaikoma-soft/raspirec/issues">gitHub の issues</a> の方にお願いします。</p>
+
+<h2 id="ライセンス">ライセンス</h2>
+<p>このソフトウェアは、Apache License Version 2.0 ライセンスのも
+とで公開します。詳しくは LICENSE を見て下さい。</p>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>raspirecTV | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="raspirecTV" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="raspirecTV" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"raspirecTV","url":"/src/raspirec-TV.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="はじめに">はじめに</h2>
+
+<p>ここでは、<a href="https://github.com/kaikoma-soft/raspirec" target="_blank">raspirec</a>
+のオプション機能で、Ver1.2.0 から導入された
+raspirecTV について説明します。</p>
+
+<h2 id="raspirectv-とは">raspirecTV とは</h2>
+
+<p>raspirecTV とは、独立した GUIで、指定した放送局を recpt1/recdvb
+を使ってチューニングし、mpv と連携させ番組を視聴するするものです。
+<br />
+特徴として、チューナーが接続されたヘッドレスの SBC 上で実行し、
+デスクトップ側で mpv を実行し表示する事が出来ます。
+<br />
+なお、プログラムは独立ですが DB は raspirec のものを参照するので、
+raspirec が、正常に稼働している必要があります。</p>
+
+<p><a href="/img/TV.png" title="main画面 と mpv画面"><img src="/img/TV.png" alt="main画面 と mpv画面" class="mmimg" /></a></p>
+
+<h2 id="実行に必要な環境">実行に必要な環境</h2>
+<ul>
+  <li>raspirec (Ver1.2.0 以上) 本体が稼働していること。</li>
+  <li>mpv 0.32.0</li>
+  <li>ruby-gtk2 3.2.4</li>
+  <li>リモート表示する場合
+    <ul>
+      <li>リモート側に mpv と socat がインストールされていること。</li>
+      <li>raspirec 側からリモート側のマシンに ssh がパスワード無しで実行出来る事。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="実行に必要なパッケージのインストール">実行に必要なパッケージのインストール</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% sudo apt install ruby-gtk2    # raspirec 側
+% sudo apt install mpv          # mpv を実行する側
+% sudo apt install socat        # mpv を実行する側
+</code></pre></div></div>
+
+<h2 id="設定">設定</h2>
+
+<h3 id="通常の場合の-configrb-の記述例">通常の場合の config.rb の記述例</h3>
+<pre>
+MPMonitor       = true          # mpv モニタ機能を有効に
+#
+DevAutoDetection =  true        # 自動検出するか ( true = する )
+DeviceList_GR   = []            # 地デジ チューナー デバイスファイル 
+DeviceList_BSCS = []            # BS/CS                  〃
+DeviceList_GBC  = []            # 三波共用(地デジ/BS/CS) 〃
+#
+Mpv_cmd     = "/usr/bin/mpv"
+Mpv_opt     = %W( --deinterlace=yes --autofit=640x360 --quiet )
+#
+RemoteMonitor   = <strong>false</strong>         # チューナーと表示が別マシンの場合に ture
+UDPbasePort     = 12345         # UDP port 
+Lsof_cmd        = "/usr/bin/lsof"
+#
+#   raspirecTV 
+#
+Browser_cmd     = "/usr/bin/firefox"
+RaspirecTV_font = "Sans 10"
+RaspirecTV_GEO  = "50+50"
+</pre>
+
+<h3 id="リモート表示とチューナーが別のマシンの場合の設定">リモート(表示と、チューナーが別のマシン)の場合の設定</h3>
+
+<pre>
+MPMonitor       = true          # mpv モニタ機能を有効に
+#
+DevAutoDetection =  true        # 自動検出するか ( true = する )
+DeviceList_GR   = []            # 地デジ チューナー デバイスファイル 
+DeviceList_BSCS = []            # BS/CS                  〃
+DeviceList_GBC  = []            # 三波共用(地デジ/BS/CS) 〃
+#
+Mpv_cmd     = "/usr/bin/mpv"
+Mpv_opt     = %W( --deinterlace=yes --autofit=640x360 --quiet )
+#
+RemoteMonitor   = <strong>true</strong>          # チューナーと表示が別マシンの場合に ture
+UDPbasePort     = 12345         # UDP port 
+Lsof_cmd        = "/usr/bin/lsof"
+#
+#   raspirecTV 
+#
+Browser_cmd     = "/usr/bin/firefox"
+RaspirecTV_font = "Sans 10"
+RaspirecTV_GEO  = "50+50"
+#
+XServerName     = "desktop"           # mpv を実行するマシン名
+RecHostName     = "raspi"             # raspirec,recpt1 を実行するマシン名
+RaspirecTV_SOCAT = "/usr/bin/socat"   # RemoteMonitor == true の時のみ
+</pre>
+
+<h2 id="実行方法">実行方法</h2>
+<p>raspirec をインストールしたディレクトリに PATH を通したあと</p>
+<pre>
+% raspirecTV.rb
+</pre>
+
+<h2 id="memo">Memo</h2>
+<h4 id="フォントの指定方法">フォントの指定方法</h4>
+<ul>
+  <li>fontconfig のインストール
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% sudo apt -y install fontconfig
+</code></pre></div>    </div>
+  </li>
+  <li>下記のコマンドで、フォントの一覧から選ぶ。(下記はIPAの例)
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>%  fc-list :lang=ja | grep IPA
+/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf: IPAゴシック,IPAGothic:style=Regular
+</code></pre></div>    </div>
+  </li>
+  <li>出力形式は、 “パス付きのファイル名: フォントファミリー名: style=スタイル”
+の形式なので、選んだ フォントファミリー名 + フォントサイズ を
+config.rb に記述する。
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>RaspirecTV_font = "IPAUIGothic 12"
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="リンク">リンク</h2>
+
+<ul>
+  <li><a href="https://github.com/kaikoma-soft/raspirec" target="_blank">gitHub raspirec</a></li>
+  <li><a href="https://kaikoma-soft.github.io/src/raspirec.html" target="_blank">raspirec ドキュメント</a></li>
+</ul>
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー (OSインストール) | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー (OSインストール)" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー (OSインストール)" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー (OSインストール)","url":"/src/raspi_OS_install.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="os-raspbian-インストール">OS (Raspbian) インストール</h2>
+
+<ol>
+  <li>
+    <p>作業PC上で公式ページ <a href="https://www.raspberrypi.org/downloads/raspbian/">https://www.raspberrypi.org/downloads/raspbian/</a> から
+Raspbian Stretch Lite をダウンロード</p>
+  </li>
+  <li>上記の img を dd で SDカードに書き込む
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ dd if=2018-11-13-raspbian-stretch-lite.img of=/dev/sdd bs=4M
+</code></pre></div>    </div>
+  </li>
+  <li>上記の SD の boot領域をマウントして ssh の設定
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ mount /dev/sdd1 /mnt/sdd
+$ touch /mnt/sdd/ssh
+</code></pre></div>    </div>
+  </li>
+  <li>boot領域をアンマウント。
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ umount /dev/sdd1
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>SDカードを抜き、raspberry Pi に挿して、電源投入。</p>
+  </li>
+  <li>しばらく待って作業用マシンから ssh でログイン。
+ mDNSが動いているので
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ ssh pi@raspberrypi.local
+</code></pre></div>    </div>
+    <p>で可能。初期パスワードは、raspberry</p>
+  </li>
+  <li>
+    <p>raspi-config を実行して、passwd, locale,time zone の設定。</p>
+  </li>
+  <li>SD カードの root領域のサイズを確認</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ fdisk -l /dev/mmcblk0
+
+Device         Boot Start      End  Sectors  Size Id Type
+/dev/mmcblk0p1       8192    98045    89854 43.9M  c W95 FAT32 (LBA)
+/dev/mmcblk0p2      98304 31116287 31017984 14.8G 83 Linux
+</code></pre></div></div>
+
+<ol>
+  <li>外付けUSB HDD の追加して、そちらをメインに。(SDカードはbootだけ)
+USB HDD は /dev/sda で認識.</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  $ fdisk /dev/sda  
+</code></pre></div></div>
+<p>で、下記のようにパーティションの設定 ( 全部で 1T )</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   /dev/sda1  16G           /
+   /dev/sda2  残り(968G)    /data
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  $ mkfs.ext4 /dev/sda1
+  $ mkfs.ext4 /dev/sda2
+</code></pre></div></div>
+
+<ol>
+  <li>/dev/sda1 を /mnt/root にマウントして、
+  dump &amp; restore で、SDの root 領域を HDD にコピー。</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  $ mkdir /mnt/root
+  $ mkdir /mnt/root/data
+  $ mount /dev/sda1 /mnt/root 
+  $ apt install dump
+  $ dump -0f - /    | ( cd /mnt/root ; restore -rf - )
+</code></pre></div></div>
+
+<ol>
+  <li>PARTUUID を調べる。(下記のどちらか)</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ls -l /dev/disk/by-partuuid
+lrwxrwxrwx 1 root root 10 12月 21 10:32 9049d880-01 -&gt; ../../sda1
+lrwxrwxrwx 1 root root 10 12月 21 10:32 9049d880-02 -&gt; ../../sda2
+lrwxrwxrwx 1 root root 15 12月 21 10:32 be23acea-01 -&gt; ../../mmcblk0p1
+lrwxrwxrwx 1 root root 15 12月 21 10:32 be23acea-02 -&gt; ../../mmcblk0p2
+
+$ blkid 
+/dev/mmcblk0p1: LABEL="boot" UUID="9304-D9FD" TYPE="vfat" PARTUUID="be23acea-01"
+/dev/mmcblk0p2: LABEL="rootfs" UUID="29075e46-f0d4-44e2-a9e7-55ac02d6e6cc" TYPE="ext4" PARTUUID="be23acea-02"
+/dev/sda1: LABEL="root" UUID="f4f8761e-5899-468f-82c5-c32922928adf" TYPE="ext4" PARTUUID="9049d880-01"
+/dev/sda2: LABEL="data" UUID="ff86fdae-92e5-49c5-b968-50da38116c34" TYPE="ext4" PARTUUID="9049d880-02"
+</code></pre></div></div>
+
+<ol>
+  <li>/mnt/root/etc/fstab を修正。
+SDカードの be23acea-02 から HDDの 9049d880-01 に書き換える
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>proc            /proc           proc    defaults          0       0
+PARTUUID=be23acea-01  /boot           vfat    defaults          0       2
+PARTUUID=be23acea-02  /               ext4    defaults,noatime  0       1
+</code></pre></div>    </div>
+    <p>↓</p>
+  </li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>proc            /proc           proc    defaults          0       0
+PARTUUID=be23acea-01  /boot           vfat    defaults          0       2
+PARTUUID=9049d880-01  /               ext4    defaults,noatime  0       1
+PARTUUID=9049d880-02  /data           ext4    defaults,noatime  0       1
+</code></pre></div></div>
+
+<ol>
+  <li>/boot/cmdline.txt のPARTUUIDも同様に書き換える。</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=PARTUUID=9049d880-01 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait
+</code></pre></div></div>
+
+<ol>
+  <li>swap の大きさと場所を変える。 /etc/dphys-swapfile
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> CONF_SWAPFILE=/data/swap
+ CONF_SWAPSIZE=1024
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h4 id="メモ">メモ</h4>
+
+<ul>
+  <li>
+    <p>最初は SDカード無し USB HDD のみの構成で構築したが、
+ その状態で PX-Q3U4 を接続すると boot しない為、
+ 仕方なく SDカードから bootして root領域は HDD に置くようにした。</p>
+  </li>
+  <li>
+    <p>SDカードの残りエリアがもったいないので、HDD の root 領域のバックアップ
+として活用する。
+その為に、HDD の root領域を SDカードのサイズに合わせた。</p>
+
+    <p>バックアップ用のスクリプトの例</p>
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkfs.ext4 /dev/mmcblk0p2
+mount /dev/mmcblk0p2 /mnt/root
+dump -0f - /  | ( cd /mnt/root ; restore -rf - )
+umount  /mnt/root
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<hr />
+<h2 id="os-のダイエット">OS のダイエット</h2>
+
+<ol>
+  <li>ipv6 の停止
+    <ol>
+      <li>/boot/cmdline.txt に “ipv6.disable=1” を追記
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=PARTUUID=9049d880-
+01 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait ipv6.disable=1
+</code></pre></div>        </div>
+      </li>
+      <li>kernel モジュールの削除(後述)</li>
+    </ol>
+  </li>
+  <li>固定IP の設定
+    <ol>
+      <li>/etc/network/interfaces に下記を追記
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>allow-hotplug eth0
+iface eth0 inet static
+ address 192.168.1.XX
+ netmask 255.255.255.0
+ gateway 192.168.1.1
+ dns-nameservers 192.168.1.YY
+</code></pre></div>        </div>
+      </li>
+    </ol>
+
+    <p>最近は /etc/dhcpcd.conf の方で設定するようだか、dhcpcdサービスを止めたら
+意味が無いので、こちらで設定する。</p>
+  </li>
+  <li>不要なサービスの停止
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ systemctl disable avahi-daemon.service
+$ systemctl disable bluetooth.service 
+$ systemctl disable cups.service 
+$ systemctl disable dhcpcd.service 
+$ systemctl disable hciuart.service 
+$ systemctl disable rsync.service 
+$ systemctl disable syslog.socket 
+$ systemctl disable rsyslog.service 
+$ systemctl disable triggerhappy.socket 
+$ systemctl disable triggerhappy.service
+$ systemctl disable wifi-country.service
+</code></pre></div>    </div>
+  </li>
+  <li>不要なカーネルモジュールの削除
+/etc/modprobe.d/raspi-blacklist.conf に下記を追記(無ければ作る)
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>blacklist brcmfmac       # Wifi
+blacklist snd_bcm2835    # サウンド
+blacklist joydev         # joy stick
+blacklist ip_tables      # パケットフィルタリング
+blacklist ipv6
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<hr />
+<h2 id="px4-ドライバーのインストール">px4 ドライバーのインストール</h2>
+
+<ol>
+  <li>必要なパッケージをインストール
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  $ apt install raspberrypi-kernel-headers dkms git
+</code></pre></div>    </div>
+  </li>
+  <li><a href="https://github.com/nns779/px4_drv">配布元</a>
+からソースをダウンロード
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  $ git clone https://github.com/nns779/px4_drv.git
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>ドキュメントに従ってインストール。</p>
+  </li>
+  <li>ドキュメントにはないが、raspbian の場合は、
+    <ol>
+      <li>
+        <p>/etc/modules に px4_drv を追記</p>
+      </li>
+      <li>
+        <p>/boot/cmdline.txt に coherent_pool=4M
+( これが無いと同時に 4TS が出来ずに 2TS になる。)</p>
+      </li>
+    </ol>
+  </li>
+  <li>reboot して lsmod | grep px4 してドラーバーはload されている事を確認。
+  PX-Q3U4 を接続して、/dev 以下にデバイスが現れるか確認。</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ls -l /dev/px*
+crw-rw-r-- 1 root video 244, 0 12月 21 11:31 /dev/px4video0
+crw-rw-r-- 1 root video 244, 1 12月 21 11:31 /dev/px4video1
+crw-rw-r-- 1 root video 244, 2 12月 21 11:31 /dev/px4video2
+crw-rw-r-- 1 root video 244, 3 12月 21 11:31 /dev/px4video3
+crw-rw-r-- 1 root video 244, 4 12月 21 11:31 /dev/px4video4
+crw-rw-r-- 1 root video 244, 5 12月 21 11:31 /dev/px4video5
+crw-rw-r-- 1 root video 244, 6 12月 21 11:31 /dev/px4video6
+crw-rw-r-- 1 root video 244, 7 12月 21 11:31 /dev/px4video7
+</code></pre></div></div>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
