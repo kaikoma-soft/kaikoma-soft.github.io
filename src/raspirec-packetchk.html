@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>raspirec パケットチェック機能 | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="raspirec パケットチェック機能" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="raspirec パケットチェック機能" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"raspirec パケットチェック機能","url":"/src/raspirec-packetchk.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="はじめに">はじめに</h2>
+
+<p>ここでは、raspirec のオプション機能である「パケットチェック機能」
+について説明する。</p>
+
+<h2 id="パケットチェック機能とは">パケットチェック機能とは</h2>
+
+<p>パケットチェック機能とは,録画した TS ファイルの健全性(drop や error) を
+<a href="https://github.com/kaikoma-soft/tspacketchk" target="_blank">tspackectchk</a>
+を使ってチェックするものです。
+<br />
+結果は、「録画済み一覧」の画面に表示されます。</p>
+
+<p><a href="/img/packetchk.png"><img src="/img/packetchk.png" alt="表示画面のサンプル" class="ssimg" /></a></p>
+
+<h2 id="機能を有効にするには">機能を有効にするには</h2>
+
+<ul>
+  <li>
+    <p>tspacketchk をインストールする。
+<br />
+インストール方法は,
+<a href="https://github.com/kaikoma-soft/tspacketchk">https://github.com/kaikoma-soft/tspacketchk</a>
+を参照。</p>
+  </li>
+  <li>config.rb 中に下記の定数を設定する。
+    <ul>
+      <li>PacketChk_enable を true</li>
+      <li>PacketChk_cmd に tspacketchk のインストール先を設定</li>
+      <li>PacketChk_rate は、実測値からフィードバックして設定</li>
+      <li>PacketChk_threshold には、画面上で赤枠を付ける閾値を設定</li>
+      <li>PacketChk_opt は任意</li>
+    </ul>
+  </li>
+  <li>config.rb の記述例
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PacketChk_enable     = true                         # true = 有効にする
+PacketChk_cmd        = "/usr/local/bin/tspacketchk" # path
+PacketChk_opt        = "-s 1 "                      # オプション
+PacketChk_threshold  = 2                            # エラーと判定する閾値
+PacketChk_rate       = 100                          # 想定速度 ( Mbyte/秒 )
+</code></pre></div>    </div>
+  </li>
+  <li>raspirec を再起動する。</li>
+</ul>
+
+<h2 id="memo">Memo</h2>
+<ul>
+  <li>チェック動作は、リアルタイムではなく空き時間に行うので、
+結果が出るまでに時間差がある。</li>
+  <li>config.rb の変更を反映させるには、再起動が必要。</li>
+  <li>結果の数字をクリックすると、検査結果が表示される。</li>
+</ul>
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>raspirec の動作テストを行う docker 環境 | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="raspirec の動作テストを行う docker 環境" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="raspirec の動作テストを行う docker 環境" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"raspirec の動作テストを行う docker 環境","url":"/src/docker-raspirec.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="目的">目的</h2>
+
+<p><a href="https://kaikoma-soft.github.io/src/raspirec.html">raspirec</a> の動作テストを
+行う docker 環境一式です。</p>
+
+<h2 id="条件">条件</h2>
+
+<ul>
+  <li>ホストマシンに、docker がインストールされていること
+    <ul>
+      <li>ubuntu の例
+        <pre>
+  % apt install docker.io
+</pre>
+      </li>
+      <li>Raspbian の例
+<br />
+パッケージの docker は古いので、公式からインストールする。
+詳細は <a href="https://www.google.com/search?client=opera&amp;q=Raspbian+docker+インストール&amp;sourceid=opera&amp;ie=UTF-8&amp;oe=UTF-8">google 検索</a>
+で。
+        <pre>
+  % curl -sSL https://get.docker.com/ | sh
+  % usermod $USER -aG docker</pre>
+      </li>
+    </ul>
+  </li>
+  <li>ホスト側に、チューナーカードに対応したドライバーがインストールされていること
+<br />
+( recpt1/recsvb の切り替えはデバイスファイルを見て自動対応します。 )
+    <table>
+  <tr>
+    <th> チューナーカード名</th>
+    <th> ドライバー  </th>
+    <th> デバイスファイル </th>
+    <th> 録画コマンド </th>
+  </tr>
+  <tr>
+    <td> PT1, PT2 </td>
+    <td> pt1_drv </td>
+    <td> /dev/pt1video0 </td>
+    <td rowspan="3"> recpt1 </td>
+  </tr>
+  <tr>
+    <td> PT3 </td>
+    <td> pt3_drv </td>
+    <td> /dev/pt3video0 </td>
+  </tr>
+  <tr>
+    <td> Plex社製 PX-Q3U4 等</td>
+    <td> px4_drv </td>
+    <td> /dev/px4video0 </td>
+  </tr>
+  <tr>
+    <td> PT1, PT2, PT3 </td>
+    <td> DVBドライバ(OS標準) </td>
+    <td> /dev/dvb/adapter0/frontend0 </td>
+    <td> recdvb *1</td>
+  </tr>
+</table>
+    <p>*1 : recdvb は本家のものではなく recpt1互換の <a href="https://github.com/dogeel/recdvb"> dogeel版 recdvb</a> を使用します。</p>
+  </li>
+  <li>デバイスファイルに適切なアクセス権が付与されていること
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> % ls -l /dev/p*video*
+ crw-rw-rw- 1 root video 242, 0 10月  1 20:01 /dev/pt1video0
+ crw-rw-rw- 1 root video 242, 1 10月  1 20:01 /dev/pt1video1
+ crw-rw-rw- 1 root video 242, 2 10月  1 20:01 /dev/pt1video2
+ crw-rw-rw- 1 root video 242, 3 10月  1 20:01 /dev/pt1video3
+</code></pre></div>    </div>
+  </li>
+  <li>ホスト側の pcscd は停止して置くこと。(Docker内でpcscd を起動します。)</li>
+</ul>
+
+<h2 id="インストール手順">インストール手順</h2>
+
+<ul>
+  <li>作業用ディレクトリを作成し、Dockerfile 一式をダウンロード
+    <pre>
+% mkdir tmp
+% cd tmp
+% git clone https://github.com/kaikoma-soft/docker-raspirec.git .
+</pre>
+  </li>
+  <li>setting.sh にパラメータが設定されているので、好みで変更する。</li>
+  <li>Docker Image をビルドする
+    <pre>
+% sh ./build.sh
+</pre>
+  </li>
+  <li>ホスト側の $HOME/docker-raspirec (Docker側の /raspirec )に
+raspirec が参照する config.rb が作成されるので、
+それをエディタで適切な値に書き換える。
+<br />
+最低限必須なのは次のもの。詳細は
+<a href="https://github.com/kaikoma-soft/raspirec/blob/master/doc/config.md">doc/config.md</a> を参照
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> GR_EPG_channel    : 地デジ EPG 受信局を設定する。
+ GR_tuner_num      : 地デジチュナー数
+ BSCS_tuner_num    : BSCSチュナー数
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="起動">起動</h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   % sh ./run.sh
+</code></pre></div></div>
+
+<h2 id="webアクセス">WEBアクセス</h2>
+<p>WEB ブラウザで、http://Dockerホスト名:45678/ へアクセスする。</p>
+
+<h2 id="停止">停止</h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   % sh ./stop.sh
+</code></pre></div></div>
+
+<h2 id="メモ">メモ</h2>
+<ul>
+  <li>recpt1,recdvb 等は /usr/local/bin にインストールされます。</li>
+  <li>raspirec は /usr/local/raspirec にインストールされます。</li>
+  <li>録画したTSファイル、DB、log 等は、
+ホスト側の $HOME/docker-raspirec (Docker側の /raspirec )に作られます。</li>
+  <li>通常 docker のイメージが保存される場所は /var/lib/docker 以下ですが、
+容量が足りない場合は、下記の手順で保存場所を変更出来ます。
+    <ul>
+      <li>/etc/docker/daemon.json を下記の内容で作成し、
+        <pre>
+{
+   "data-root": "/ssd1/docker"
+}
+</pre>
+      </li>
+      <li>docker を再起動する。
+        <pre>
+% sudo service docker restart
+</pre>
+      </li>
+    </ul>
+  </li>
+  <li>ドライバーの無効化は、/etc/modprobe.d/blacklist.conf で行う。
+    <pre>
+blacklist earth_pt1
+#blacklist pt1_drv
+</pre>
+  </li>
+</ul>
+
+<h2 id="動作確認環境">動作確認環境</h2>
+
+<table>
+  <tbody>
+    <tr>
+      <td>ホストOS</td>
+      <td>Ubuntu 18.04.5 LTS</td>
+      <td>Raspbian GNU/Linux 9 (stretch)</td>
+    </tr>
+    <tr>
+      <td>チューナー</td>
+      <td>PT2</td>
+      <td>PX-Q3U4</td>
+    </tr>
+    <tr>
+      <td>ドライバー</td>
+      <td>pt1_drv,DVBドライバ(OS標準)</td>
+      <td>px4_drv</td>
+    </tr>
+    <tr>
+      <td>Docker</td>
+      <td>19.03.6</td>
+      <td>19.03.13</td>
+    </tr>
+    <tr>
+      <td>Docker ベース・イメージ</td>
+      <td>Ubuntu:20.10</td>
+      <td>raspbian/stretch</td>
+    </tr>
+    <tr>
+      <td>生成したImage のサイズ</td>
+      <td>178MB (  HLS有効の場合は 615MB)</td>
+      <td>392MB</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="注意事項">注意事項</h2>
+
+<ul>
+  <li>動作テスト用なので、ファイルサイズ、セキュリティの考慮はしていません。</li>
+</ul>
+
+<h2 id="リンク">リンク</h2>
+<ul>
+  <li><a href="https://github.com/stz2012/recpt1" target="_blank">recpt1</a></li>
+  <li><a href="https://github.com/dogeel/recdvb">recdvb</a></li>
+  <li><a href="https://github.com/Piro77/epgdump" target="_blank">epgdump</a></li>
+  <li><a href="https://github.com/nns779/px4_drv" target="_blank">px4_drv</a></li>
+  <li><a href="http://www.asahi-net.or.jp/~sy8y-siy/src/raspirec.html" target="_blank">ナマケモノの家 raspirec</a></li>
+  <li><a href="https://github.com/kaikoma-soft/raspirec" target="_blank">gitHub raspirec</a></li>
+  <li><a href="https://kaikoma-soft.github.io/src/raspirec.html" target="_blank">gitHub Pages raspirec</a></li>
+</ul>
+
+<h2 id="連絡先">連絡先</h2>
+
+<p>不具合報告などは、
+<a href="https://github.com/kaikoma-soft/docker-raspirec/issues">GitHub issuse</a>
+の方にお願いします。</p>
+
+<h2 id="ライセンス">ライセンス</h2>
+<p>このソフトウェアは、Apache License Version 2.0 ライセンスのも
+とで公開します。詳しくは LICENSE を見て下さい。</p>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

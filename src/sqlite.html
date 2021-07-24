@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Sqlite3 の排他制御のテスト | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Sqlite3 の排他制御のテスト" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Sqlite3 の排他制御のテスト" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"Sqlite3 の排他制御のテスト","url":"/src/sqlite.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="概要">概要</h2>
+
+<p>SQLite の排他制御の動作が不思議だったので、検証コードを作ってテストした。</p>
+
+<ul>
+  <li>
+    <p>片方が transation 中に、もう片方がアクセスすると 
+SQLite3::BusyException になる。( その時は retry はしていなかった。)</p>
+  </li>
+  <li>
+    <p>busy_timeout(5000) を指定しても効いて無いように見える。</p>
+  </li>
+</ul>
+
+<h2 id="検証コード">検証コード</h2>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'rubygems'</span>
+<span class="nb">require</span> <span class="s1">'sqlite3'</span>
+
+<span class="no">DBfile</span> <span class="o">=</span> <span class="s2">"./test.db"</span>
+
+<span class="k">unless</span> <span class="no">File</span><span class="p">.</span><span class="nf">exist?</span><span class="p">(</span> <span class="no">DBfile</span> <span class="p">)</span>
+  <span class="n">db</span> <span class="o">=</span> <span class="no">SQLite3</span><span class="o">::</span><span class="no">Database</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">DBfile</span> <span class="p">)</span>
+  <span class="n">sql</span> <span class="o">=</span> <span class="o">&lt;&lt;</span><span class="no">EOS</span><span class="sh">
+create table  data (
+    id        integer  primary key,
+    name      text
+);
+</span><span class="no">EOS</span>
+  <span class="n">db</span><span class="p">.</span><span class="nf">execute_batch</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+  <span class="n">db</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+<span class="k">end</span>
+
+<span class="mi">0</span><span class="p">.</span><span class="nf">upto</span><span class="p">(</span> <span class="mi">100</span> <span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">n</span><span class="o">|</span>
+  <span class="n">db</span> <span class="o">=</span> <span class="no">SQLite3</span><span class="o">::</span><span class="no">Database</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">DBfile</span> <span class="p">)</span>
+  <span class="n">ecount</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">begin</span>
+    <span class="n">db</span><span class="p">.</span><span class="nf">busy_timeout</span><span class="p">(</span><span class="mi">5000</span><span class="p">)</span>
+    <span class="n">db</span><span class="p">.</span><span class="nf">transaction</span> <span class="k">do</span>
+      <span class="no">STDERR</span><span class="p">.</span><span class="nf">print</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
+      <span class="no">STDERR</span><span class="p">.</span><span class="nf">flush</span><span class="p">()</span>
+      <span class="n">db</span><span class="p">.</span><span class="nf">execute</span><span class="p">(</span><span class="s2">"insert into data ( name ) values ( ? )"</span><span class="p">,</span> <span class="n">n</span> <span class="p">)</span>
+      <span class="nb">rand</span><span class="p">(</span><span class="mi">11</span><span class="p">).</span><span class="nf">downto</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">n</span><span class="o">|</span>
+        <span class="no">STDERR</span><span class="p">.</span><span class="nf">print</span><span class="p">(</span><span class="s2">"-"</span><span class="p">)</span>
+        <span class="no">STDERR</span><span class="p">.</span><span class="nf">flush</span><span class="p">()</span>
+        <span class="nb">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">rescue</span> <span class="no">SQLite3</span><span class="o">::</span><span class="no">BusyException</span>
+    <span class="no">STDERR</span><span class="p">.</span><span class="nf">print</span><span class="p">(</span><span class="s2">"*"</span><span class="p">)</span>
+    <span class="no">STDERR</span><span class="p">.</span><span class="nf">flush</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ecount</span> <span class="o">&gt;</span> <span class="mi">10</span>
+      <span class="nb">print</span> <span class="s2">"&gt;SQLite3::BusyException</span><span class="se">\n</span><span class="s2">"</span>
+      <span class="nb">exit</span>
+    <span class="k">end</span>
+    <span class="n">ecount</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="nb">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">retry</span>
+  <span class="k">rescue</span> <span class="o">=&gt;</span> <span class="n">e</span>
+    <span class="nb">p</span> <span class="vg">$!</span>
+    <span class="nb">exit</span>
+  <span class="k">end</span>
+  <span class="n">db</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+  <span class="no">STDERR</span><span class="p">.</span><span class="nf">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+  <span class="no">STDERR</span><span class="p">.</span><span class="nf">flush</span><span class="p">()</span>
+  <span class="nb">sleep</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h2 id="実験">実験</h2>
+
+<p>コンソールを 2つ開き、同じディレクトリで上記のプログラムを実行する。</p>
+
+<ul>
+  <li>コンソール1
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.-----
+.*.----------
+.*.*.-
+.*.*.----
+.*.-----------
+.*.*.-
+.*.-----------
+.*.--------
+.*.*.--
+</code></pre></div>    </div>
+  </li>
+  <li>コンソール2
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.*.*.-------
+.*.-----
+.*.*.-
+.*.-
+.*.-
+.*.*.-----
+.*.----------
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="判った事">判った事</h2>
+
+<ul>
+  <li>
+    <p>何故か transaction が競合すると、
+1回目は busy_timeout(5000) は効かず例外が起きる。
+その後 rerty すると有効になる。
+<br />
+ただし FreeBSD の SQLite3.7.3 は一発目からちゃんと待つ。
+待たないのは Linux の SQLite 3.3.6</p>
+  </li>
+  <li>
+    <p>なので、いずれにせよちゃんと retry してやれば、transaction      <br />
+でもアクセスの競合を防ぐ排他制御が可能</p>
+  </li>
+</ul>
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

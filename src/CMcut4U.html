@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>CMcut4U ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って自動 CMカット | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="CMcut4U ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って自動 CMカット" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="CMcut4U ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って自動 CMカット" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"CMcut4U ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って自動 CMカット","url":"/src/CMcut4U.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="お知らせ">お知らせ</h2>
+
+<p>本ソフトウエアは、開発中止とします。
+後継は、改良版である
+<a href="https://github.com/kaikoma-soft/CMcut4U-Mk2">CMcut4U2</a> です。</p>
+
+<h2 id="背景">背景</h2>
+
+<p>従来 Unix系OS 上で 自動CMカットを行おうとすると comskip
+ぐらいしか選択肢が無かった。
+しかし comskip は精度が悪かったり、
+誤判定した時のリカバリが面倒だったりしたので、
+自作することにしました。</p>
+
+<h2 id="目的">目的</h2>
+
+<p>本プログラムは、「PT2等で録画した mpeg2tsファイルを H.265(HEVC) にエンコードしつつ同時に自動で CMカットを Linux(Unix 系 OS) 上で実行する」為のものです。</p>
+
+<h2 id="特徴">特徴</h2>
+
+<ul>
+  <li>ロゴファイルを用意しておけば、条件が良ければほぼ全自動で
+CM カットして H.265(HEVC) にエンコード出来る。</li>
+  <li>分割したチャプター数、時間を期待値と比較して結果を表示。</li>
+  <li>期待値と異なった場合は、GUI で修正パラメータを入力してリトライ出来る。</li>
+  <li>デメリット
+    <ul>
+      <li>最終確認は人間が目視で行う必要がある。</li>
+      <li>カットの精度はフレーム単位ではなく秒単位であり、
+またマージンを取っているので、CM部分が多少残る。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="処理概要">処理概要</h2>
+
+<p>CMカット単体の処理の概要は下記の通りです。</p>
+
+<ul>
+  <li>入力は PT2 で録画した mpeg2ts ファイル</li>
+  <li>TSファイルを ffmpeg で、音声(wav)とスクリンーショット(jpeg)に分解。</li>
+  <li>音声ファイルを解析して、無音部分でチャプター分け。</li>
+  <li>Opencv のテンプレートマッチを使って、jpeg にロゴマークがあるかで、
+本編／CM  を判定 (あらかじめロゴファイルは手作業で抽出しておく)</li>
+  <li>経験則で、チャプターを整理統合する。</li>
+  <li>得られたチャプター情報を元に TS をチャプター毎に mp4 にエンコード</li>
+  <li>最後にエンコードした mp4 ファイルを、連結して本編のみの mp4 ファイルを出力する。</li>
+</ul>
+
+<p>これを、TSdir で指定したディレクトリ以下の .ts ファイルに対して繰り返し、
+Outdir で指定したディレクトリに mp4 ファイルを出力します。</p>
+
+<h2 id="実行に必要な環境">実行に必要な環境</h2>
+
+<ul>
+  <li>Ubuntu 18.04.1 LTS (多分Unix系ならなんでも)</li>
+  <li>ruby  2.5.1p57</li>
+  <li>ruby-gtk2 3.2.4</li>
+  <li>ruby-wave</li>
+  <li>python 2.7.15rc1</li>
+  <li>Opencv 3.4.1</li>
+  <li>ffmpeg(ffprobe) 4.0</li>
+  <li>mpv 0.27.2</li>
+  <li>gimp ver.2.8.22
+(logoファイルの抽出に使用。矩形領域の切り抜きができれば何でも可)</li>
+  <li>X window (fixGUI.rb の実行に必要)</li>
+</ul>
+
+<h2 id="インストール">インストール</h2>
+
+<p>下記のコマンド例は、Ubuntu でのものです。
+他の OS の場合は、コマンドやパッケージ名は適宜変更して下さい。</p>
+
+<h3 id="ruby">ruby</h3>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>apt <span class="nb">install </span>ruby
+<span class="nv">$ </span><span class="nb">sudo </span>apt <span class="nb">install </span>ruby-gtk2
+<span class="nv">$ </span><span class="nb">sudo </span>gem <span class="nb">install </span>wav-file
+</code></pre></div></div>
+
+<h3 id="python">python</h3>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>apt <span class="nb">install </span>python-dev python-numpy
+</code></pre></div></div>
+
+<h3 id="ffmpeg--mpv">ffmpeg &amp; mpv</h3>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>apt <span class="nb">install </span>ffmpeg
+<span class="nv">$ </span><span class="nb">sudo </span>apt <span class="nb">install </span>mpv
+</code></pre></div></div>
+
+<h3 id="opencv">opencv</h3>
+<p>opencv は公式パッケージには無いので、
+<a href="https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html">opencvの 公式ページ</a>
+の手順に従ってソースからインストール。</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>apt <span class="nb">install </span>cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+<span class="nv">$ </span><span class="nb">sudo </span>apt <span class="nb">install </span>libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libdc1394-22-dev
+<span class="nv">$ </span><span class="nb">mkdir </span>tmp <span class="p">;</span> <span class="nb">cd </span>tmp
+<span class="nv">$ </span>git clone https://github.com/opencv/opencv.git
+<span class="nv">$ </span>git clone https://github.com/opencv/opencv_contrib.git
+<span class="nv">$ </span><span class="nb">cd </span>opencv <span class="p">;</span> <span class="nb">mkdir </span>build <span class="p">;</span> <span class="nb">cd </span>build
+<span class="nv">$ </span>cmake <span class="nt">-D</span> <span class="nv">CMAKE_BUILD_TYPE</span><span class="o">=</span>Release <span class="nt">-D</span> <span class="nv">CMAKE_INSTALL_PREFIX</span><span class="o">=</span>/usr/local ..
+<span class="nv">$ </span>make
+<span class="nv">$ </span>make <span class="nb">install</span>
+</code></pre></div></div>
+
+<h3 id="本ソフト">本ソフト</h3>
+
+<ol>
+  <li>インストールするディレクトリを決める。( 例:~/video/CMcut4U  )</li>
+  <li>そこに git-hub から
+ <a href="https://github.com/kaikoma-soft/CMcut4U/archive/master.zip">https://github.com/kaikoma-soft/CMcut4U/archive/master.zip</a>
+をダウンロードして展開する。
+または
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> git clone https://github.com/kaikoma-soft/CMcut4U.git <span class="nb">.</span>
+</code></pre></div>    </div>
+    <p>を実行する。</p>
+  </li>
+  <li>環境変数 PATH に上記のディレクトリを追加する。</li>
+  <li>const.rb の中身を自分の環境に合わせて、書き換える</li>
+</ol>
+
+<table>
+  <thead>
+    <tr>
+      <th>パラメータ名</th>
+      <th>意味</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Top</td>
+      <td>TSファイル等のデータを格納するディレクトリ</td>
+    </tr>
+    <tr>
+      <td>CPU_core</td>
+      <td>CPUのCPUのコア数</td>
+    </tr>
+    <tr>
+      <td>$ffmpeg_bin</td>
+      <td>ffmpeg の実行ファイル名</td>
+    </tr>
+    <tr>
+      <td>$nomalSize</td>
+      <td>エンコード後の本編画面サイズ</td>
+    </tr>
+    <tr>
+      <td>$comSize</td>
+      <td>エンコード後の CM 画面サイズ</td>
+    </tr>
+    <tr>
+      <td>$python_bin</td>
+      <td>python の実行ファイル名</td>
+    </tr>
+  </tbody>
+</table>
+
+<ol>
+  <li>入力ファイル、出力ファイル、作業用ディレクトリを作成する。<br />
+( 例は、Top がそのままの場合 )
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> % <span class="nb">mkdir</span> <span class="nv">$HOME</span>/video
+ % <span class="nb">cd</span> <span class="nv">$HOME</span>/video
+ % <span class="nb">mkdir </span>TS mp4 logo work
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="ディレクトリ構造">ディレクトリ構造</h2>
+
+<h3 id="入力データ-mpeg2ts-ファイル-">入力データ( mpeg2ts ファイル )</h3>
+
+<p>入力の TS ファイルは、TS ディレクトリ以下に番組単位のサブディレクトリを
+作りその中に置く。</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Top
+├── TS
+│   ├── 番組名-1
+│   │   ├── タイトル #01.ts
+│   │   ├── タイトル #02.ts
+│   │   └── ...
+│   ├── 番組名-2
+│   │   ├── タイトル #01.ts
+│   │   ├── タイトル #02.ts
+│   │   └── ...
+│   └── ...
+│       ├── ...
+│       ├── ...
+│       └── ...
+
+</code></pre></div></div>
+
+<h3 id="出力ファイルmp4ファイル">出力ファイル(mp4ファイル)</h3>
+
+<p>出力の mp4 ファイルは  Top/mp4 以下に TSディレクトリと相似したものが
+  生成される。</p>
+
+<h2 id="使用方法">使用方法</h2>
+
+<ol>
+  <li>エンコード対象の TS ファイルを「TS/番組名」ディレクトリの下に置く。</li>
+  <li>cmcuterAll.rb を実行する。 <br />
+この段階では、logoファイルが存在しないので、スクリーンショットと
+ wav ファイルを作業ディレクトリに作っただけで、エラーで止まる。</li>
+  <li>logoファイルを作成する。
+( <a href="/src/create-logo.html">詳細はこちら</a> を参照して下さい。)
+    <ol>
+      <li>スクリーンショットが保存されたディレクトリを指定して
+   logoAnalysisSub.py を実行する。
+        <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> % logoAnalysisSub.py <span class="nt">--dir</span> work/番組名/タイトル/SS
+</code></pre></div>        </div>
+      </li>
+      <li>
+        <p>スクリーンショット画像が表示されるので、
+ロゴマークが明瞭な時点の画像を保存する。</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>キー</th>
+              <th>意味</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>j</td>
+              <td>60コマ( 30秒)飛ぶ</td>
+            </tr>
+            <tr>
+              <td>k</td>
+              <td>60コマ( 30秒)戻る</td>
+            </tr>
+            <tr>
+              <td>s</td>
+              <td>現在の画像を保存する。</td>
+            </tr>
+            <tr>
+              <td>b</td>
+              <td>前のコマ( 0.5秒)に戻る</td>
+            </tr>
+            <tr>
+              <td>q</td>
+              <td>終了</td>
+            </tr>
+            <tr>
+              <td>上記以外</td>
+              <td>次のコマ( 0.5秒)に進む</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+      <li>保存した画像の下部（白黒＋強調）部分のロゴマークを
+ を gimp を使って、最小限の大きさで矩形領域の切り抜き
+ (「ツール」-&gt; 「変形ツール」-&gt; 「切り抜き」)をする。</li>
+      <li>「画像」-&gt; 「モード」-&gt; 「グレイスケール」で、グレイスケール化する。</li>
+      <li>logo ディレクトリの下に、画像を保存する。</li>
+    </ol>
+  </li>
+  <li>logo-table.yaml を書き換える。<br />
+TS ディレクトリの下に logo-table.yaml が自動作成されているので、
+その中の logofn パラメータを、上で保存したlogo ファイル名に書き換える。
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   XXXXX:
+       :logofn: YYYY.png
+       :cmlogofn:
+       :position: top-right
+       :chapNum: 6
+       :duration: 465
+</code></pre></div>    </div>
+  </li>
+  <li>再度 cmcuterAll.rb を実行する。</li>
+</ol>
+
+<h2 id="実行コマンドの説明">実行コマンドの説明</h2>
+
+<ul>
+  <li>cmcuterAll.rb
+    <ul>
+      <li>機能<br />
+TS ディレクトリの tsファイルに対して解析を行い、mp4(HEVC) エンコードを行う。</li>
+      <li>
+        <p>オプション</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>option</th>
+              <th>意味</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">-f</code></td>
+              <td>lock を無視して実行する。</td>
+            </tr>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--co</code></td>
+              <td>CMカットに必要な計算のみ行う。mp4(HEVC)化のエンコードは行わない</td>
+            </tr>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--cm</code></td>
+              <td>本編画面サイズを $comSize にする。</td>
+            </tr>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--ng</code></td>
+              <td>NG なものだけ対象にする。(cmcuterChk.rb 参照)</td>
+            </tr>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--ic</code></td>
+              <td>chapList.txt のハッシュチェックを行わない。(chapList.txt参照)</td>
+            </tr>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--uc</code></td>
+              <td>中間結果ファイルを再利用する。</td>
+            </tr>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--sa n</code></td>
+              <td>誤差の許容範囲を n 秒にする。デフォルトは 3秒</td>
+            </tr>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--dd n</code></td>
+              <td>n = 1 : 出力 mp4 ファイルを削除</td>
+            </tr>
+            <tr>
+              <td> </td>
+              <td>n = 2 : 上記 + chapList ファイルを削除</td>
+            </tr>
+            <tr>
+              <td> </td>
+              <td>n = 3 : 上記 + 作業ディレクトリの logo 解析キャッシュを削除</td>
+            </tr>
+            <tr>
+              <td> </td>
+              <td>n = 4 : 上記 + 作業ディレクトリのチャプタ毎 mp4 ファイルを削除</td>
+            </tr>
+            <tr>
+              <td> </td>
+              <td>n = 5 : 上記 + 作業ディレクトリの wav,jpeg ファイルを削除</td>
+            </tr>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--ar</code></td>
+              <td>作業用ファイルの自動削除</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+    </ul>
+  </li>
+  <li>cmcuterChk.rb
+    <ul>
+      <li>
+        <p>機能<br />
+CMカットが正しく行われたかチェックする。<br />
+logo-table.yaml ファイルに書かれた値と比較して、OK/NG を表示する。
+チェックするのは、mp4ファイルがあるか、チャプター数、本編の時間。</p>
+      </li>
+      <li>
+        <p>オプション</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>option</th>
+              <th>意味</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--ng</code></td>
+              <td>結果が NG な番組だけ表示する。</td>
+            </tr>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--sa n</code></td>
+              <td>誤差の許容範囲を n 秒にする。デフォルトは 3秒</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+      <li>
+        <p>出力例</p>
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   &gt;&gt;&gt;&gt;&gt;  番組名 XXXXX  &lt;&lt;&lt;&lt;&lt;&lt;&lt;
+    ( chapNum=10, duration=1440 )
+
+   No       Name    mp4 chap   duration      result
+    1         01     ○   10     1440.0         OK
+    2         02     ○   10     1440.0         OK
+    3         03     ○   10     1440.0         OK
+    4         04     ○   10     1440.0         OK
+    5         05     ○   10     1440.0         OK
+    6         06     ○   10     1440.0         OK
+    7         07     ○   10     1440.0         OK
+    8         08     ○   10     1440.0         OK
+    9         09     ○   10     1440.0         OK
+   10         10     ○   10     1440.0         OK
+   11         11     ○   10     1440.0         OK
+   12         12     ○   10     1430.0(-10)    NG
+</code></pre></div>        </div>
+      </li>
+    </ul>
+  </li>
+  <li>fixGUI.rb
+    <ul>
+      <li>
+        <p>機能<br />
+修正ファイル( Top/TS/番組名/fix.yaml ) を GUIで作成する。
+これにより、自動判定が間違っている場合に、強制的に 本編/CM
+を固定することが出来る。</p>
+
+        <p>使い方は、</p>
+        <ul>
+          <li>対象のTSファイルを指定する。</li>
+          <li>「計算」ボタンを押す。</li>
+          <li>「mpv 起動/終了」ボタンを押すと mpv が起動する。
+  mpv が起動した状態で、表中に時間の欄をマウスでクリックすると、
+ mpv がその時間まで seek するので、自動判定の結果が正しいか目視で
+ 確認する。</li>
+          <li>誤判定が見つかったの行の fix の欄をマウスでクリックし、
+本編、CM  の固定を選択する。</li>
+          <li>再度「計算」ボタンを押し、画面下部の結果表示が○になっている事を
+確認して「終了」する。</li>
+        </ul>
+
+        <p><img src="/img/fixGUI.png" alt="GUI画面の例" /></p>
+      </li>
+      <li>
+        <p>オプション</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>option</th>
+              <th>意味</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--uc</code></td>
+              <td>中間結果ファイルを再利用する。</td>
+            </tr>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--sa n</code></td>
+              <td>誤差の許容範囲を n 秒にする。デフォルトは 3秒</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+      <li>
+        <p>注意<br />
+修正した mp4 を得るには cmcuterAll.rb を実行する必要がある。</p>
+      </li>
+    </ul>
+  </li>
+  <li>logoTblEdit.rb
+    <ul>
+      <li>
+        <p>機能<br />
+修正ファイル( Top/TS/logo-table.yaml ) を GUIで編集する。</p>
+
+        <p>使い方は、</p>
+        <ul>
+          <li>対象のディレクトリを選択する。</li>
+          <li>パラメータを入力する。</li>
+          <li>「保存」ボタンを押し、値をファイルに書き込む。</li>
+          <li>「閉じる」ボタンを押し、終了する。</li>
+        </ul>
+
+        <p><img src="/img/logoTblEdit.png" alt="GUI画面の例" /></p>
+      </li>
+      <li>
+        <p>オプション</p>
+
+        <p>なし</p>
+      </li>
+    </ul>
+  </li>
+  <li>logoAnalysisSub.py
+    <ul>
+      <li>
+        <p>機能<br />
+スクリーンショットの画像と logoファイルのテンプレートマッチングを行う。
+<code class="language-plaintext highlighter-rouge">--dir</code> オプションだけ指定された場合は、表示モードになる。</p>
+      </li>
+      <li>
+        <p>オプション</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>option</th>
+              <th>意味</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--dir name</code></td>
+              <td>スクリーンショットが保存された dir を指定する。</td>
+            </tr>
+            <tr>
+              <td><code class="language-plaintext highlighter-rouge">--logo name</code></td>
+              <td>logo ファイル名を指定する。</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="設定ファイルの説明">設定ファイルの説明</h2>
+
+<ul>
+  <li>
+    <p>logo-table.yaml</p>
+
+    <ul>
+      <li>
+        <p>番組名単位で、下記のパラメタを設定するファイル。
+エントリーはディレクトリの有無で、自動的に作成／削除されるので、
+値を書き換える。( Top/TS/logo-table.yaml )</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>keyword</th>
+              <th>意味</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>:logofn:</td>
+              <td>本編を認識する為の logo ファイル名。( Top/logo 以下の相対パス)</td>
+            </tr>
+            <tr>
+              <td>:cmlogofn:</td>
+              <td>CM 判定の為の logo ファイル名（<a href="/src/create-logo.html/#cm-ロゴファイルの作成">詳細は後述</a>）</td>
+            </tr>
+            <tr>
+              <td>:position:</td>
+              <td>logo の画面上の位置。デフォルトは “top-right” で “top-left”, “bottom-left”,”bottom-right” が指定可</td>
+            </tr>
+            <tr>
+              <td>:chapNum:</td>
+              <td>チャプター数</td>
+            </tr>
+            <tr>
+              <td>:duration:</td>
+              <td>本編の時間(秒数)</td>
+            </tr>
+            <tr>
+              <td>:monolingual</td>
+              <td>二カ国放送を日本語のみにするオプションを追加。デフォルト 0 <br />   0 : なし <br /> 1 : <code class="language-plaintext highlighter-rouge">-map_channel 0.1.0  -map_channel 0.1.0</code> (音声の左右の場合)<br /> 2 : <code class="language-plaintext highlighter-rouge">-ac 1 -map 0:v -map 0:1</code> (ストリームが別の場合)</td>
+            </tr>
+            <tr>
+              <td>:audio_only</td>
+              <td>logo解析を行わず、音声のみでチャプター割を行う。true/false デフォルトは false</td>
+            </tr>
+            <tr>
+              <td>:fade_inout</td>
+              <td>フェードイン、アウトを行う true/false。 デフォルトは true</td>
+            </tr>
+            <tr>
+              <td>:ffmpeg_vfopt</td>
+              <td>mp4エンコード時の -vf オプションに任意の文字列を追加する。(4:3に変換する時など)</td>
+            </tr>
+            <tr>
+              <td>:ignore_endcard</td>
+              <td>Endcard の検出の無効化 true/false デフォルトは false</td>
+            </tr>
+            <tr>
+              <td>:ignore_check</td>
+              <td>このディレクトリ cmcuterChk の対象外とする true/false デフォルトは false</td>
+            </tr>
+            <tr>
+              <td>:mp4skip</td>
+              <td>このディレクトリは無視する true/false デフォルトは false</td>
+            </tr>
+            <tr>
+              <td>:cmcut_skip</td>
+              <td>CMカット処理は行わず、丸ごと mp4化する。true/false デフォルトは false</td>
+            </tr>
+            <tr>
+              <td>:opening_delay</td>
+              <td>本編の開始時間を指定した秒数遅延させる。デフォルト 0</td>
+            </tr>
+            <tr>
+              <td>:closeing_delay</td>
+              <td>本編の終了時間を指定した秒数遅延させる。デフォルト 0</td>
+            </tr>
+            <tr>
+              <td>:nhk_type</td>
+              <td>本編途中にCMが無く、本編の前後に長い無音期間が有る場合 true。デフォルトは false</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+      <li>chapNum と duration は、末尾に数字 0〜9 を付けて複数記述可</li>
+      <li>記述例
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  XXXXX:
+      :logofn: YYYY.png
+      :cmlogofn:
+      :position: top-right
+      :chapNum: 6
+      :chapNum1: 8
+      :duration: 465
+      :duration2: 495
+      :monolingual: 2
+      :audio_only: true
+      :fade_inout: false
+      :ffmpeg_vfopt: crop=1440:1080:240:0
+</code></pre></div>        </div>
+      </li>
+    </ul>
+  </li>
+  <li>fix2.yaml
+    <ul>
+      <li>自動判定が間違っている場合に、強制的に 本編/CM を固定する修正情報ファイル。
+        <ul>
+          <li>パスは Top/TS/番組名/fix2.yaml</li>
+          <li>Ver 0.7.0 以前は ファイル名は fix.yaml
+書式は同じだが解釈に互換性はない</li>
+        </ul>
+      </li>
+      <li>
+        <p>記述例</p>
+
+        <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="s">---</span>
+  <span class="s">- - All</span>
+    <span class="s">- </span><span class="m">1606</span>
+    <span class="pi">-</span> <span class="s">HonPen</span>
+</code></pre></div>        </div>
+      </li>
+    </ul>
+  </li>
+  <li>chapList.txt
+    <ul>
+      <li>
+        <p>チャプター割の計算結果が格納されたファイル。
+( $Top/work/番組名/タイトル/chapList.txt)<br />
+計算結果が間違っていた場合、このファイルを修正して再実行すると
+それに従って、再変換される。   <br />
+なお修正した場合は cmcutAll.rb 実行時に –ic オプションを付けて実行する必要がある。
+  （付けないと自動判定の計算が行われてしまう。）</p>
+      </li>
+      <li>
+        <p>例</p>
+
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  0:00:00.00  CM
+  0:01:36.90  HonPen
+  0:04:11.92  CM
+  0:06:27.37  HonPen
+  0:15:07.89  CM
+  0:17:22.88  HonPen
+  0:29:06.88  CM
+  0:30:06.00  EOF
+</code></pre></div>        </div>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="特殊ファイルの説明">特殊ファイルの説明</h2>
+
+<ul>
+  <li>
+    <p>cmcut.skip</p>
+
+    <p>TS/番組名/cmcut.skip のファイルが存在すると、そのディレクトリにある TSファイルは、
+CMcut の計算処理を行わず、丸ごと H.265(HEVC) にエンコードを行う。</p>
+  </li>
+  <li>
+    <p>mp4.skip</p>
+
+    <p>TS/番組名/mp4.skip のファイルが存在すると、そのディレクトリにある TSファイルは、
+全て無視される。</p>
+  </li>
+</ul>
+
+<h2 id="カスタマイズ">カスタマイズ</h2>
+
+<p>cmcuterAll.rb と同じ場所に、override.rb という名前でファイルを置くと、
+メソッドのオーバーライドが可能です。<br />
+具体的にはハードウエアエンコードを使用したい場合などに用います。</p>
+
+<ul>
+  <li>override.rb の例
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class Ffmpeg
+  #
+  #  h264_nvenc を使用
+  #
+  def ts2x265( opt, debug = false )
+    arg = %W( -y )
+    arg += %W( -ss #{opt[:ss]} -t #{opt[:t]} ) if opt[:ss] != nil
+    arg += %W( -i #{@tsfn} )
+    arg += %W( -vcodec h264_nvenc -preset fast -acodec aac )
+    arg += %W( -s 640x360 #{opt[:outfn]} )
+    system2( "/usr/bin/ffmpeg", *arg )
+  end
+end
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="性能">性能</h2>
+
+<ul>
+  <li>環境
+    <ul>
+      <li>Core i5-3570 CPU @ 3.40GHz</li>
+      <li>Mem 8G</li>
+      <li>Ubuntu 18.04.1 LTS</li>
+    </ul>
+  </li>
+  <li>ソース
+    <ul>
+      <li>BS11 アニメ 30分</li>
+      <li>画面サイス 1920x1080</li>
+      <li>ファイルサイズ 4,232,185,312 Byte</li>
+    </ul>
+  </li>
+  <li>出力ファイル
+    <ul>
+      <li>画面サイス       1280x720</li>
+      <li>ファイルサイズ   111,292,555 Byte</li>
+    </ul>
+  </li>
+  <li>
+    <p>実行時間</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="text-align: left">項目</th>
+          <th style="text-align: right">時間(秒)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: left">スクリーンショット作成</td>
+          <td style="text-align: right">92.17</td>
+        </tr>
+        <tr>
+          <td style="text-align: left">wav 作成</td>
+          <td style="text-align: right">20.64</td>
+        </tr>
+        <tr>
+          <td style="text-align: left">logo 解析</td>
+          <td style="text-align: right">30.43</td>
+        </tr>
+        <tr>
+          <td style="text-align: left">チャプター分割</td>
+          <td style="text-align: right">1.95</td>
+        </tr>
+        <tr>
+          <td style="text-align: left">HEVCエンコード</td>
+          <td style="text-align: right">1684.95</td>
+        </tr>
+        <tr>
+          <td style="text-align: left">計</td>
+          <td style="text-align: right">1830.14</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>
+    <p>CM判定実績( 2018年夏アニメ )</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>タイトル</th>
+          <th>放送局</th>
+          <th>話数</th>
+          <th>fix数</th>
+          <th>fix内容</th>
+          <th>結果</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>3D彼女 リアルガール</td>
+          <td>BS日テレ</td>
+          <td>12話</td>
+          <td>全1+1</td>
+          <td>前番組の最後と予告編を誤判定</td>
+          <td>△</td>
+        </tr>
+        <tr>
+          <td>あそびあそばせ</td>
+          <td>BS11</td>
+          <td>12話</td>
+          <td>0</td>
+          <td>-</td>
+          <td>○</td>
+        </tr>
+        <tr>
+          <td>すのはら荘の管理人さん</td>
+          <td>BS11</td>
+          <td>12話</td>
+          <td>1</td>
+          <td>12話 提供+EndCard をCM と誤判定</td>
+          <td>△</td>
+        </tr>
+        <tr>
+          <td>はたらく細胞</td>
+          <td>BS11</td>
+          <td>13話</td>
+          <td>0</td>
+          <td>-</td>
+          <td>○</td>
+        </tr>
+        <tr>
+          <td>はねバド!</td>
+          <td>BS11</td>
+          <td>13話</td>
+          <td>0</td>
+          <td>-</td>
+          <td>○</td>
+        </tr>
+        <tr>
+          <td>ゆらぎ荘の幽奈さん</td>
+          <td>BS11</td>
+          <td>12話</td>
+          <td>0</td>
+          <td>-</td>
+          <td>○</td>
+        </tr>
+        <tr>
+          <td>アンゴルモア元寇合戦記</td>
+          <td>BS11</td>
+          <td>12話</td>
+          <td>0</td>
+          <td>-</td>
+          <td>○</td>
+        </tr>
+        <tr>
+          <td>オーバーロードⅢ</td>
+          <td>BS11</td>
+          <td>13話</td>
+          <td>0</td>
+          <td>-</td>
+          <td>○</td>
+        </tr>
+        <tr>
+          <td>ハイスコアガール</td>
+          <td>BS11</td>
+          <td>12話</td>
+          <td>1</td>
+          <td>11話最後のおまけ15秒部分</td>
+          <td>△</td>
+        </tr>
+        <tr>
+          <td>プラネット・ウィズ</td>
+          <td>BS11</td>
+          <td>12話</td>
+          <td>0</td>
+          <td>-</td>
+          <td>○</td>
+        </tr>
+        <tr>
+          <td>ヤマノススメ3</td>
+          <td>BS11</td>
+          <td>13話</td>
+          <td>0</td>
+          <td>-</td>
+          <td>○</td>
+        </tr>
+        <tr>
+          <td>ロード オブ ヴァーミリオン</td>
+          <td>BS11</td>
+          <td>12話</td>
+          <td>0</td>
+          <td>-</td>
+          <td>○</td>
+        </tr>
+        <tr>
+          <td>七星のスバル</td>
+          <td>BS11</td>
+          <td>12話</td>
+          <td>1</td>
+          <td>07話で、予告編を誤判定</td>
+          <td>△</td>
+        </tr>
+        <tr>
+          <td>天狼 Sirius the Jaeger</td>
+          <td>BS11</td>
+          <td>12話</td>
+          <td>0</td>
+          <td>-</td>
+          <td>○</td>
+        </tr>
+        <tr>
+          <td>殺戮の天使</td>
+          <td>BS11</td>
+          <td>12話</td>
+          <td>0</td>
+          <td>-</td>
+          <td>○</td>
+        </tr>
+        <tr>
+          <td>百錬の覇王と聖約の戦乙女</td>
+          <td>BS11</td>
+          <td>12話</td>
+          <td>全1</td>
+          <td>全話共通で、予告編を誤判定</td>
+          <td>△</td>
+        </tr>
+        <tr>
+          <td>邪神ちゃんドロップキック</td>
+          <td>BSフジ</td>
+          <td>11話</td>
+          <td>0</td>
+          <td>-</td>
+          <td>○</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ul>
+
+<h2 id="既知の問題点">既知の問題点</h2>
+
+<ul>
+  <li>番組宣伝の等の CM に 5秒,10秒のものがあるが、それが CM と認識されない。</li>
+</ul>
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

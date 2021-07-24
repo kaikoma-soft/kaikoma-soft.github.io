@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>CMcut4U MkⅡ ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って半自動 CMカット | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="CMcut4U MkⅡ ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って半自動 CMカット" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="CMcut4U MkⅡ ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って半自動 CMカット" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"CMcut4U MkⅡ ： Linux(Unix 系 OS) 上で FFmpeg,OpenCV を使って半自動 CMカット","url":"/src/CMcut4U2.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="はじめに">はじめに</h2>
+
+<p>本プログラムは、旧版である <a href="https://github.com/kaikoma-soft/CMcut4U">CMcut4U</a>
+を、精度向上等を目的として再構築したものです。</p>
+
+<h2 id="旧版からの改良点">旧版からの改良点</h2>
+
+<ul>
+  <li>シーンチェンジ検出を導入して、精度の向上</li>
+  <li>GUIツールを統合し連携を密にして作業性の向上</li>
+  <li>mp4エンコード部をシェルスクリプト化してカスタマイズしやすいように。</li>
+  <li>番組毎に、エンコード方法を選択出来るように。</li>
+  <li>目視チェックの工程も取り込み、作業終了までの一貫性を持たせた。</li>
+  <li>作業終了で、テンポラリファイルを削除、
+TSファイルもゴミ箱に移動させた後、一定時間後に自動削除するように。</li>
+  <li>内部データ構造の整理</li>
+  <li><a href="subtitle.html">字幕処理の追加</a></li>
+  <li><a href="CMcut4U2-removelogo.html">ロゴ消し機能</a></li>
+  <li><a href="CMcut4U2-macro.html">CM/本編 判定ユーザー定義マクロ</a></li>
+</ul>
+
+<h2 id="目的">目的</h2>
+
+<p>本プログラムの目的は「PT2等で録画した mpeg2tsファイルを半自動で CMカットし、
+希望の形式でエンコードをする」です。</p>
+
+<h2 id="特徴">特徴</h2>
+
+<ul>
+  <li>CM/本編 自動判定の精度は 90% 程度だが、
+番組毎に期待値を設定することにより、
+CMカットが上手く行ったかの見分けを容易としている。</li>
+  <li>自動判定が 上手く行かなかった時は、
+チャプター割り振りの変更を容易にする GUI で修正をする事が出来る</li>
+  <li>Linux(Unix 系 OS) 上で動作する。</li>
+</ul>
+
+<h2 id="プログラムの概要">プログラムの概要</h2>
+
+<ul>
+  <li>
+    <p>TSファイルと、あらかじめ用意したlogo ファイルを入力することにより、
+TSファイルを解析して、CM/本編の自動判定を行う。<br />
+オプションで、logo 解析を行わず音声のみでカットするモードと、
+CMカットせずに丸ごとエンコードするモードが選択可能。</p>
+  </li>
+  <li>自動判定の精度は 90% 程度なので、番組毎にチャプター数と本編時間の
+期待値を設定し、それと一致するかで一次判定を行う。<br />
+なお自動判定に失敗するのは、次のような場合
+    <ul>
+      <li>5秒、10秒等の 15秒の倍数でない CM</li>
+      <li>ロゴ付きの CM</li>
+      <li>ロゴなしで次回予告＋提供が 15秒のもの</li>
+      <li>BS の長尺のCM(テレビショッピング)</li>
+      <li>パケットのdrop により、映像と音声にずれがある場合</li>
+    </ul>
+  </li>
+  <li>
+    <p>一次判定が NG の場合、専用の GUI を使って CM/本編の割付の修正を行う。</p>
+  </li>
+  <li>
+    <p>一次判定が OK になると、エンコードを行う。</p>
+  </li>
+  <li>
+    <p>エンコードの実行部は、自環境に合わせてカスタマイズ出来るように
+シェルスクリプトになっていて、番組毎に選択可能。</p>
+  </li>
+  <li>エンコード終了後に、作成した本編、CM ファイルの二次判定を行う。
+二次判定は、動画プレイヤーにより
+本編に CM が混じっていないこと、CM に本編が混じっていないことを目視で
+確認する。
+もし、修正が必要なら、修正GUI に戻って修正する。<br />
+OK ならば、TSファイル、作業ファイルを削除して、終了とする。</li>
+</ul>
+
+<!--more-->
+
+<h2 id="実行に必要な環境">実行に必要な環境</h2>
+
+<ul>
+  <li>Ubuntu 18.04.1 LTS (多分Unix系ならなんでも)</li>
+  <li>ruby  2.5.1 以上</li>
+  <li>ruby-gtk2 3.2.4</li>
+  <li>ruby-wave</li>
+  <li>python 2.7 以上</li>
+  <li>Opencv 3.4.1</li>
+  <li>ffmpeg(ffprobe) 3.4.6</li>
+  <li>mpv 0.27.2</li>
+  <li>gimp ver.2.8.22
+(logoファイルの抽出に使用。矩形領域の切り抜きができれば何でも可)</li>
+  <li>X window (GUIツール の実行に必要)</li>
+</ul>
+
+<h2 id="インストール">インストール</h2>
+
+<p>下記のコマンド例は、Ubuntu でのものです。
+他の OS の場合は、コマンドやパッケージ名は適宜変更して下さい。</p>
+
+<h3 id="ruby">ruby</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% sudo apt install ruby
+% sudo apt install ruby-gtk2
+% sudo gem install wav-file
+</code></pre></div></div>
+
+<h3 id="python">python</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% sudo apt install python-dev python-numpy
+</code></pre></div></div>
+
+<h3 id="ffmpeg--mpv">ffmpeg &amp; mpv</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% sudo apt install ffmpeg
+% sudo apt install mpv
+</code></pre></div></div>
+
+<h3 id="opencv">opencv</h3>
+<p>opencv は公式パッケージには無いので、
+<a href="https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html">opencvの 公式ページ</a>
+の手順に従ってソースからインストール。</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% sudo apt install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+% sudo apt install libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libdc1394-22-dev
+% mkdir tmp ; cd tmp
+% git clone https://github.com/opencv/opencv.git
+% git clone https://github.com/opencv/opencv_contrib.git
+% cd opencv ; mkdir build ; cd build
+% cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local ..
+% make
+% sudo make install
+</code></pre></div></div>
+
+<h3 id="本ソフト">本ソフト</h3>
+
+<ol>
+  <li>インストールするディレクトリを決めて下記を実行する。
+( 例:~/video/CMcut4U2  )
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> % mkdir -p  $HOME/video/CMcut4U2
+ % cd $HOME/video/CMcut4U2
+ % git clone https://github.com/kaikoma-soft/CMcut4U-Mk2.git .
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>環境変数 PATH に上記のディレクトリを追加する。</p>
+  </li>
+  <li>config.rb を $HOME/.config/CMcut4U2/config.rb にコピーし、
+その中身を自分の環境に合わせて書き換える。</li>
+</ol>
+
+<table>
+  <thead>
+    <tr>
+      <th>パラメータ名</th>
+      <th>意味</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Top</td>
+      <td>TSファイル等のデータを格納するディレクトリ</td>
+    </tr>
+    <tr>
+      <td>FFMPEG_BIN</td>
+      <td>ffmpeg の実行ファイル名</td>
+    </tr>
+    <tr>
+      <td>PYTHON_BIN</td>
+      <td>python の実行ファイル名</td>
+    </tr>
+    <tr>
+      <td>NomalSize</td>
+      <td>エンコード後の本編画面サイズ</td>
+    </tr>
+    <tr>
+      <td>CMSize</td>
+      <td>エンコード後の CM 画面サイズ</td>
+    </tr>
+    <tr>
+      <td>ToMp4</td>
+      <td>エンコードスクリプトのデフォルト設定</td>
+    </tr>
+    <tr>
+      <td>Mpv_opt</td>
+      <td>mpv 起動時のオプション文字列</td>
+    </tr>
+    <tr>
+      <td>DelTSZero</td>
+      <td>TSファイル削除時に、0byte のファイルを残すか</td>
+    </tr>
+    <tr>
+      <td>FadeOut</td>
+      <td>チャプターの継ぎ目にFadeOutを挿入するかのデフォルト値</td>
+    </tr>
+    <tr>
+      <td>FadeOutTime</td>
+      <td>FadeOutの時間(秒)</td>
+    </tr>
+    <tr>
+      <td>Autoremove</td>
+      <td>作業ディレクトリの自動削除を行うか (true=行う)</td>
+    </tr>
+    <tr>
+      <td>TsExpireDay</td>
+      <td>ゴミ箱に移動したTSファイルを何日で削除するか(日)</td>
+    </tr>
+    <tr>
+      <td>FrontMargin</td>
+      <td>チャプターを打つタイミングとの継ぎ目のマージン(秒)</td>
+    </tr>
+    <tr>
+      <td>Subtitling</td>
+      <td>字幕の処理を行うか(true=行う)</td>
+    </tr>
+    <tr>
+      <td>ForceCmTime</td>
+      <td>強制的にCMする秒数の候補</td>
+    </tr>
+    <tr>
+      <td>LIBEXEC2</td>
+      <td>カスタマイズしたスクリプトを置くディレクトリを指定する。<br /> CMcut4U2/libexec の代替</td>
+    </tr>
+  </tbody>
+</table>
+
+<ol>
+  <li>入力ファイル、出力ファイル、作業用ディレクトリを作成する。<br />
+( 下記の例は、Top が $HOME/video の場合 )
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> % mkdir $HOME/video
+ % cd $HOME/video
+ % mkdir TS mp4 logo work
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="ディレクトリ構造">ディレクトリ構造</h2>
+
+<h3 id="入力データ-mpeg2ts-ファイル-">入力データ( mpeg2ts ファイル )</h3>
+
+<p>入力の TS ファイルは、TS ディレクトリ以下に番組単位のサブディレクトリを
+作りその中に置く。</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Top
+├── TS
+│   ├── 番組名-1
+│   │   ├── タイトル #01.ts
+│   │   ├── タイトル #02.ts
+│   │   └── ...
+│   ├── 番組名-2
+│   │   ├── タイトル #01.ts
+│   │   ├── タイトル #02.ts
+│   │   └── ...
+│   └── ...
+│       ├── ...
+│       ├── ...
+│       └── ...
+
+</code></pre></div></div>
+
+<h3 id="出力ファイルmp4ファイル">出力ファイル(mp4ファイル)</h3>
+
+<p>出力の mp4 ファイルは  Top/mp4 以下に TSディレクトリと相似したものが
+  生成される。</p>
+
+<h2 id="使用方法">使用方法</h2>
+
+<ol>
+  <li>
+    <p>録画した TS ファイルを「TS/番組名」ディレクトリの下に置く。</p>
+  </li>
+  <li>
+    <p>logoファイルが無ければ、先に作成する。
+( 後述する <a href="#create_logo">logoファイルの作成方法</a> を参照して下さい。)</p>
+  </li>
+  <li>初回は、番組毎のパラメータ設定で、ロゴファイル等の設定を行う。
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  % CMcut4U2.rb <span class="nt">--paraedit</span>
+</code></pre></div>    </div>
+  </li>
+  <li>TSファイルの解析を行う。
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  % CMcut4U2.rb
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>初回は、期待値が設定されていないので必ず NG になる。<br />
+そこで修正GUI を起動し、チャプターの CM/本編が正しくなるまで修正を
+行い、最後に「現在の計算値を期待値として設定」ボタンを押し、
+「終了」する。</p>
+  </li>
+  <li>再度コマンド実行すると、エンコードまで実行される。
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  % CMcut4U2.rb
+</code></pre></div>    </div>
+  </li>
+  <li>目視による最終チェックを行う。
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  % CMcut4U2.rb <span class="nt">--viewchk</span>
+</code></pre></div>    </div>
+    <p>動画プレイヤー(mpv)で、本編とCM が再生されるので、
+  本編に CM が混じっていないこと、CM に本編が混じっていないことを目視で
+  チェックする。
+  もし、変更が必要なら、修正GUI に戻って修正する。<br />
+  OK ならば、TSファイル、作業ファイルを削除して、終了とする。</p>
+  </li>
+</ol>
+
+<h2 id="logo-ファイルの作成方法-">logo ファイルの作成方法 <a name="create_logo"></a></h2>
+
+<ol>
+  <li>番組毎のパラメータ設定で、ロゴの位置を指定する。
+    <ol>
+      <li>パラメータ設定ダイアログを起動する。
+        <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> % CMcut4U2.rb <span class="nt">--paraedit</span>
+</code></pre></div>        </div>
+      </li>
+      <li>対象ディレクトリを選択する。</li>
+      <li>ロゴの位置(右上、右下、左下、左上)を選択し、保存してから閉じる。</li>
+    </ol>
+  </li>
+  <li>CMcut4U2.rb --logo を実行する。 必要なら --regex で対象を絞る。
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> % CMcut4U2.rb <span class="nt">--logo</span>
+</code></pre></div>    </div>
+    <ol>
+      <li>
+        <p>スクリーンショット生成の後、ビューアーで画像が表示されるので、
+ロゴマークが明瞭なものを探し、その画像を保存する。<br />
+ビューアーの操作方法は下記の通りです。</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>キー</th>
+              <th>意味</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>j</td>
+              <td>60コマ( 30秒)飛ぶ</td>
+            </tr>
+            <tr>
+              <td>k</td>
+              <td>60コマ( 30秒)戻る</td>
+            </tr>
+            <tr>
+              <td>s</td>
+              <td>現在の画像をカレントディレクトリに保存する。</td>
+            </tr>
+            <tr>
+              <td>b</td>
+              <td>前のコマ( 0.5秒)に戻る</td>
+            </tr>
+            <tr>
+              <td>q</td>
+              <td>終了</td>
+            </tr>
+            <tr>
+              <td>上記以外</td>
+              <td>次のコマ( 0.5秒)に進む</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+      <li>保存した画像の下部（白黒＋強調）部分のロゴマークを
+ を 画像処理ソフト(ここでは gimp) を使って、
+ 最小限の大きさで矩形領域の切り抜き
+ (「ツール」-&gt; 「変形ツール」-&gt; 「切り抜き」)をする。</li>
+      <li>「画像」-&gt; 「モード」-&gt; 「グレイスケール」で、グレイスケール化する。</li>
+      <li>logo ディレクトリの下に、名前を付けて画像を保存する。</li>
+    </ol>
+  </li>
+</ol>
+
+<h2 id="実行コマンドの説明">実行コマンドの説明</h2>
+
+<ul>
+  <li>CMcut4U2
+    <ul>
+      <li>機能<br />
+TS ディレクトリの tsファイルに対して解析を行い、
+CMカット、エンコードを行う。</li>
+      <li>
+        <p>オプション</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>short</th>
+              <th>long</th>
+              <th>意味  (詳細はリンク先)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>-C</td>
+              <td>--config file</td>
+              <td><a href="#config">configファイルの指定</a></td>
+            </tr>
+            <tr>
+              <td>-O</td>
+              <td>--odir dir</td>
+              <td><a href="#odir">出力Dirの指定</a></td>
+            </tr>
+            <tr>
+              <td>-W</td>
+              <td>--wdir dir</td>
+              <td><a href="#wdir">作業用Dirの指定</a></td>
+            </tr>
+            <tr>
+              <td>-L</td>
+              <td>--logodir dir</td>
+              <td><a href="#logodir">logo Dirの指定</a></td>
+            </tr>
+            <tr>
+              <td>-R</td>
+              <td>--regex str</td>
+              <td><a href="#regex">処理対象ファイルの指定(正規表現</a>)</td>
+            </tr>
+            <tr>
+              <td>-d</td>
+              <td>--debug</td>
+              <td><a href="#debug">debug mode</a></td>
+            </tr>
+            <tr>
+              <td>-F</td>
+              <td>--force</td>
+              <td><a href="#force">自動判定処理の強制実行</a></td>
+            </tr>
+            <tr>
+              <td>-c</td>
+              <td>--co</td>
+              <td><a href="#co">自動判定処理のみ</a></td>
+            </tr>
+            <tr>
+              <td>-N</td>
+              <td>--nc</td>
+              <td><a href="#nc">キャッシュデータを使わない</a></td>
+            </tr>
+            <tr>
+              <td>-f</td>
+              <td>--fix</td>
+              <td><a href="#fix">チャプター修正ダイアログの起動</a></td>
+            </tr>
+            <tr>
+              <td>-n</td>
+              <td>--ngfix</td>
+              <td><a href="#ngfix">chk が NG の時、チャプター修正ダイアログを起動</a></td>
+            </tr>
+            <tr>
+              <td>-p</td>
+              <td>--paraedit</td>
+              <td><a href="#paraedit">パラメータ設定ダイアログを起動</a></td>
+            </tr>
+            <tr>
+              <td>-P</td>
+              <td>--–emptyPara</td>
+              <td><a href="#emptyPara">パラメータが未設定のものだけパラメータ設定ダイヤログを起動</a></td>
+            </tr>
+            <tr>
+              <td>-v</td>
+              <td>--viewchk</td>
+              <td><a href="#viewchk">目視チェックで go/no go を決定</a></td>
+            </tr>
+            <tr>
+              <td> </td>
+              <td>--tomp4 shell</td>
+              <td><a href="#tomp4">mp4 エンコードするスクリプトの指定</a></td>
+            </tr>
+            <tr>
+              <td>-a</td>
+              <td>--autoremove</td>
+              <td><a href="#autoremove">作業ディレクトリの自動削除</a></td>
+            </tr>
+            <tr>
+              <td>-E</td>
+              <td>--forceEnc</td>
+              <td><a href="#forceEnc">期待値照合の結果を無視してエンコードを実行</a></td>
+            </tr>
+            <tr>
+              <td>-l</td>
+              <td>--logo</td>
+              <td><a href="#logo">ロゴ作成モード</a></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <ul>
+          <li>
+            <p>--config file <a name="config"></a></p>
+
+            <p>定数定義ファイル(config.rb) のパスを指定する。
+読み込みの優先順位は次の通り。</p>
+            <ol>
+              <li>--config で指定したファイル</li>
+              <li>環境変数 CMCUT4U2_CONF で指定したファイル</li>
+              <li>$HOME/.config/CMcut4U2/config.rb</li>
+            </ol>
+          </li>
+          <li>
+            <p>--odir dir <a name="odir"></a></p>
+
+            <p>config.rb 中の 定数 Outdir を指定したディレクトリに変更する。</p>
+          </li>
+          <li>
+            <p>--wdir dir <a name="wdir"></a></p>
+
+            <p>config.rb 中の 定数 Workdir を指定したディレクトリに変更する。</p>
+          </li>
+          <li>
+            <p>--logodir dir <a name="logodir"></a></p>
+
+            <p>config.rb 中の 定数 LogoDir を指定したディレクトリに変更する。</p>
+          </li>
+          <li>
+            <p>--regex str  <a name="regex"></a></p>
+
+            <p>処理対象を、str で指定した正規表現に subdir/TSファイル名が
+一致したものだけに限定する。
+正規表現は ruby の文法と同じ。</p>
+
+            <p>例   --regex タモリ  =&gt; ブラタモリ、タモリ倶楽部に一致</p>
+          </li>
+          <li>
+            <p>--debug <a name="debug"></a></p>
+
+            <p>デバックモードで実行する。</p>
+          </li>
+          <li>
+            <p>--force <a name="force"></a></p>
+
+            <p>通常出力ファイルが既に存在すれば CM自動判定処理は飛ばすが、
+それを強制的に実行させる。</p>
+          </li>
+          <li>
+            <p>--co <a name="co"></a></p>
+
+            <p>CM自動判定処理まで実行するが、その後のエンコード処理は行わない。</p>
+          </li>
+          <li>
+            <p>--nc <a name="nc"></a></p>
+
+            <p>workdir のCM自動判定処理の中間データ(キャッシュ)を使わないで
+再実行する。</p>
+          </li>
+          <li>
+            <p>--fix <a name="fix"></a></p>
+
+            <p>チャプター修正ダイアログの起動する。
+対象を絞る場合は、--regex を併用する。</p>
+
+            <p>使い方は、</p>
+            <ul>
+              <li>対象のディレクトリ、TSファイルを選択する。</li>
+              <li>「mpv 起動/終了」ボタンを押すと mpv が起動する。
+ mpv が起動した状態で、表中に時間の欄をマウスでクリックすると、
+ mpv がその時間まで seek するので、自動判定の結果が正しいか目視で
+ 確認する。</li>
+              <li>誤判定が見つかったの行の fix の欄をマウスでクリックし、
+本編、CM  を選択する。</li>
+              <li>設定し終わったら「変更書き込み」ボタンを押し、
+画面下部の結果表示が○になっている事を
+   確認して「終了」する。</li>
+            </ul>
+
+            <p><img src="/img/fixGUI2.png" alt="修正GUI画面の例" /></p>
+          </li>
+          <li>
+            <p>--ngfix <a name="ngfix"></a></p>
+          </li>
+        </ul>
+
+        <p>判定結果が NG のファイルにのみチャプター修正ダイアログの起動する。</p>
+
+        <ul>
+          <li>
+            <p>--viewchk   <a name="viewchk"> </a></p>
+
+            <p>目視チェックで go/no go を決定</p>
+          </li>
+          <li>
+            <p>--paraedit <a name="paraedit"> </a></p>
+
+            <p>番組毎に設定するパラメータを入力するパラメータ設定ダイアログを
+起動する。<br />
+対象を絞る場合は、--regex を併用する。</p>
+
+            <p>使い方は、</p>
+            <ul>
+              <li>対象のディレクトリを選択する。</li>
+              <li>パラメータを入力する。</li>
+              <li>「保存」ボタンを押し、値をファイルに書き込む。</li>
+              <li>「閉じる」ボタンを押し、終了する。</li>
+            </ul>
+
+            <p><img src="/img/para.png" alt="GUI画面の例" /></p>
+          </li>
+          <li>
+            <p>--emptyPara <a name="emptyPara"> </a></p>
+
+            <p>パラメータが未設定のものだけパラメータ設定ダイヤログを起動する。</p>
+          </li>
+          <li>
+            <p>--tomp4 shell <a name="tomp4"></a></p>
+
+            <p>mp4 エンコードするスクリプトの指定する。 優先順位は<br />
+引数 &gt; パラメータファイル &gt; config</p>
+          </li>
+          <li>
+            <p>--autoremove  <a name="autoremove"></a></p>
+
+            <p>作業ディレクトリの自動削除の実行／非実行を反転させる。
+ デフォルトの値は config.rb 中の Autoremove の値</p>
+          </li>
+          <li>
+            <p>--forceEnc    <a name="forceEnc"></a></p>
+
+            <p>期待値照合の結果を無視してエンコードを実行する。</p>
+          </li>
+          <li>
+            <p>--logo  <a name="logo"></a></p>
+
+            <p>ロゴ作成モードで実行する。
+対象を絞る場合は、--regex を併用する。</p>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="カスタマイズ">カスタマイズ</h2>
+
+<h4 id="ffmpeg-エンコード">ffmpeg エンコード</h4>
+
+<p>ディレクトリ libexe 以下に、エンコードに使うshellスクリプトがある。
+ffmpeg のオプション等を変えたい場合は、それらを直接書き換えるか、
+既存の物をコピーして変更を加える。</p>
+
+<h2 id="連絡先">連絡先</h2>
+
+<p>不具合報告などは、
+<a href="https://github.com/kaikoma-soft/CMcut4U-Mk2/issues">GitHub issuse</a>
+の方にお願いします。</p>
+
+<h2 id="リンク">リンク</h2>
+
+<ul>
+  <li><a href="https://mpv.io/manual/master/">mpv ドキュメント</a></li>
+  <li><a href="http://www.asahi-net.or.jp/~sy8y-siy/src/CMcut4U2.html" target="_blank">ナマケモノの家 CMcut4UMk2</a></li>
+  <li><a href="https://github.com/kaikoma-soft/CMcut4U-Mk2" target="_blank">gitHub CMcut4UMk2</a></li>
+  <li><a href="https://kaikoma-soft.github.io/src/CMcut4U2.html" target="_blank">gitHub Pages CMcut4U2</a></li>
+</ul>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

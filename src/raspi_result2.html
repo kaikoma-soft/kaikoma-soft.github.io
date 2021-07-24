@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( ドライバ更新結果 ) | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( ドライバ更新結果 )" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( ドライバ更新結果 )" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( ドライバ更新結果 )","url":"/src/raspi_result2.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="目的">目的</h2>
+
+<p>2019/04/13 に px4_drv が更新され、
+同時に 5ch に作者さんからドロップ低減の為の設定についての記事が投稿された。</p>
+
+<p>設定内容</p>
+<ul>
+  <li>/boot/cmdline.txt に「dwc_otg.host_rx_fifo_size=2048」を追記</li>
+  <li>/etc/modprobe.d/px4_drv.conf というファイルを作成し、
+以下のような内容を記述する
+    <ul>
+      <li>rev: 87以降の場合<br />
+「 options px4_drv xfer_packets=51 urb_max_packets=816 max_urbs=6 」</li>
+      <li>rev: 86以前の場合<br />
+「 options px4_drv xfer_packets=51 max_urbs=64 」</li>
+    </ul>
+  </li>
+</ul>
+
+<p>そこで、最新版での性能測定を行う。</p>
+
+<hr />
+<h2 id="結果">結果</h2>
+
+<p>従来は最大 3本(mysql同居不可)が限界だったが、
+最新版では 7本(mysql同居可)に素晴らしく改善された。(単体テスト時)
+<br />
+px4_drvの作者さんに感謝を。
+<br />
+<br />
+＜追記＞
+実運用のテストでは、６本同時から若干のドロップが発生するので、
+その辺りが限界と思われる。</p>
+
+<hr />
+<h2 id="単体での計測結果">単体での計測結果</h2>
+
+<p>条件</p>
+<ul>
+  <li>録画時間は 10分</li>
+  <li>ドライバーは px4_drv version 0.1.0, rev: 104</li>
+  <li>apache, mysqld は起動中。負荷は掛けず。</li>
+  <li>recpt1 は stz版</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th>条件</th>
+      <th>ビットレート(Mbyte/秒)</th>
+      <th>drop数</th>
+      <th>判定</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>地デジ×1</td>
+      <td>2.06</td>
+      <td>0</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>地デジ×2</td>
+      <td>4.12</td>
+      <td>0</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>地デジ×3</td>
+      <td>6.17</td>
+      <td>0</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>地デジ×4</td>
+      <td>8.23</td>
+      <td>0</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>BS×1</td>
+      <td>2.33</td>
+      <td>0</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>BS×2</td>
+      <td>4.66</td>
+      <td>0</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>BS×3</td>
+      <td>6.99</td>
+      <td>0</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>BS×4</td>
+      <td>9.32</td>
+      <td>0</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>BS×4 + 地デジ×1</td>
+      <td>11.38</td>
+      <td>1</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>BS×4 + 地デジ×2</td>
+      <td>13.43</td>
+      <td>0</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>BS×4 + 地デジ×3</td>
+      <td>15.49</td>
+      <td>0</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>BS×4 + 地デジ×4</td>
+      <td>17.16</td>
+      <td>29238</td>
+      <td>×</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+<h2 id="実運用での計測結果">実運用での計測結果</h2>
+
+<p>条件</p>
+<ul>
+  <li>期間は 2019/04/16 〜 04/26</li>
+  <li>ドライバーは px4_drv version 0.1.0, rev: 104</li>
+  <li>録画ソフトは epgrec una版 + 録画中は EPG更新を行わない改造</li>
+  <li>recpt1 は stz版</li>
+  <li>録画時に b25 デコードはなし</li>
+  <li>総録画時間は 248本  153.8H</li>
+  <li>内訳は、
+1本     113本、
+2本同時  73本、
+3本同時  33本、
+4本同時   6本、
+5本同時   5本、
+6本同時  18本</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th>drop数</th>
+      <th>本数</th>
+      <th>備考</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0 〜 1</td>
+      <td>243</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>2 〜 10</td>
+      <td>3</td>
+      <td>6本同時</td>
+    </tr>
+    <tr>
+      <td>11 〜 25</td>
+      <td>0</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>26 〜 50</td>
+      <td>0</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>51 〜 100</td>
+      <td>1</td>
+      <td>6本同時</td>
+    </tr>
+    <tr>
+      <td>101 〜 200</td>
+      <td>1</td>
+      <td>6本同時</td>
+    </tr>
+    <tr>
+      <td>計</td>
+      <td>248</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

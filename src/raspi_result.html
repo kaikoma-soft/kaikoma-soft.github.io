@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( 試行結果 ) | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( 試行結果 )" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( 試行結果 )" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバー ( 試行結果 )","url":"/src/raspi_result.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="目的">目的</h2>
+
+<p>Raspberry Pi 3B+ ＋ Raspbian ＋ PX-Q3U4 + epgrecUNA で録画サーバーを
+構築して試行したが、思った以上にドロップがあるので、
+録画したファイルの全数の drop 数をカウントし、対策を検討する。</p>
+
+<hr />
+<h2 id="drop-数のカウント結果-その１">drop 数のカウント結果 (その１)</h2>
+
+<p>条件</p>
+<ol>
+  <li>期間 ： 2019/01/20 〜 2019/02/21</li>
+  <li>対象は主に BS の 30分番組</li>
+  <li>カウント方法は tsselect を実行し、パケット数の上位 10 番目までの PID に限定する。</li>
+</ol>
+
+<table>
+  <thead>
+    <tr>
+      <th>drop数</th>
+      <th>本数</th>
+      <th>備考</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0以上   10未満</td>
+      <td>137 本</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>10以上  50未満</td>
+      <td>14 本</td>
+      <td>3本同時が 1組, 2本同時が 4組</td>
+    </tr>
+    <tr>
+      <td>50以上 100未満</td>
+      <td>4 本</td>
+      <td>2本同時が 1組,単独が2本</td>
+    </tr>
+    <tr>
+      <td>100以上</td>
+      <td>17 本</td>
+      <td>3本同時が 2組, 2本同時が 2組,EPGと重複？4本</td>
+    </tr>
+    <tr>
+      <td>計</td>
+      <td>172 本</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>考察</p>
+<ol>
+  <li>録画中に 定期の EPG 取得があるとドロップする。</li>
+  <li>epgrecUNA の機能として、録画の3分前に EPG 取得の動作があるが、
+それが録画中に起きると、ドロップする。</li>
+  <li>3本はもちろん、2本同時録画でもドロップしやすい。</li>
+  <li>その他に、原因不明だが “Cannot tune to the specified channel” で録画や
+EPG取得に失敗する事が数回あった。(reboot しないと復帰せず。)</li>
+</ol>
+
+<hr />
+<h2 id="対策案">対策案</h2>
+
+<p>根本的原因は、CPU が非力なのでデータの転送に間に合わない事によると思われる。
+従って対策は次のものが考えられる。</p>
+
+<ol>
+  <li>
+    <p>ドライバ(カーネル) の動作を極力妨害しないように、
+それ以外のプロセスの優先度を下げる。</p>
+  </li>
+  <li>
+    <p>試験的に mysql を別のマシンに移設して mysqld の停止。
+(スタンドアロンで無くなるのは問題なので、結果が良ければ DB を
+  sqlite に換装することを検討する。)</p>
+  </li>
+  <li>
+    <p>録画と同時に行っていた b25 エンコードを、別のタイミングで行うように。</p>
+  </li>
+  <li>
+    <p>録画中は 定期の EPG取得のスクリプトを動かさないように。</p>
+  </li>
+  <li>
+    <p>録画開始前の EPG取得を止める。</p>
+  </li>
+  <li>
+    <p>MTA の postfix を止め、msmtp に替える。</p>
+  </li>
+  <li>
+    <p>予防的に毎朝 OS をreboot する様に。</p>
+  </li>
+</ol>
+
+<hr />
+<h2 id="対策後の-drop-数のカウント結果">対策後の drop 数のカウント結果</h2>
+
+<p>上記の対策をした結果は次の通り。</p>
+
+<p>条件</p>
+<ol>
+  <li>期間 ： 2019/03/07 〜 2019/03/20</li>
+  <li>総録画時間は 95 時間</li>
+  <li>内訳は, ３本同時 28本、２本同時 49本、単独 96本</li>
+  <li>その他の条件は、その１と同じ</li>
+</ol>
+
+<table>
+  <thead>
+    <tr>
+      <th>drop数</th>
+      <th>本数</th>
+      <th>備考</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>126</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>1 〜 10</td>
+      <td>36</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>11 〜 25</td>
+      <td>2</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>26 〜 50</td>
+      <td>6</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>51 〜 100</td>
+      <td>3</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>計</td>
+      <td>173</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>以上のことから、BS ３本同時までならば実用的には問題ない範囲と判断する。
+(残る問題は mysql のサーバーをどうするか。)</p>
+
+<hr />
+<h2 id="参考データ">参考データ</h2>
+
+<p>地デジ,BS,CS を組みわせた場合の、可否は次の通り。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>条件</th>
+      <th>ビットレート(Mbyte/秒)</th>
+      <th>drop数</th>
+      <th>判定</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>地デジ × 3</td>
+      <td>5.81</td>
+      <td>0</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>BS × 3</td>
+      <td>7.24</td>
+      <td>たまに小</td>
+      <td>○</td>
+    </tr>
+    <tr>
+      <td>地デジ × 4</td>
+      <td>7.75</td>
+      <td>小</td>
+      <td>×</td>
+    </tr>
+    <tr>
+      <td>BS × 2 + CS × 1</td>
+      <td>9.06</td>
+      <td>多</td>
+      <td>×</td>
+    </tr>
+    <tr>
+      <td>BS × 4</td>
+      <td>9.31</td>
+      <td>多</td>
+      <td>×</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>
+    <p>本機では ビットレート 7.2 Mbyte/秒 あたりが限界。
+ しかし ftp 転送では 約 20Mbyte/秒は出ているので、
+ PLEX社製のドライバー＆ファームウエアの出来が良くない為ではないかと推測する。
+ <br />
+ (最低動作環境を満たしていないので文句は言えないが。)</p>
+  </li>
+  <li>CSはトランスポンダ単位の受信なので、ビットレートが高くなる。</li>
+  <li>これ以上の対策は(raspi を諦めるしか）思いつかない。</li>
+</ul>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
