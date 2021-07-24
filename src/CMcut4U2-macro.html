@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>CMcut4U2 の 本編／CM 判定 ユーザー定義マクロ | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="CMcut4U2 の 本編／CM 判定 ユーザー定義マクロ" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="CMcut4U2 の 本編／CM 判定 ユーザー定義マクロ" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"CMcut4U2 の 本編／CM 判定 ユーザー定義マクロ","url":"/src/CMcut4U2-macro.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="はじめに">はじめに</h2>
+
+<p>CMcut4U2 Ver 0.4.0 で追加された
+「本編／CM 判定 ユーザー定義マクロ」
+機能についての説明です。</p>
+
+<h2 id="概要">概要</h2>
+
+<ul>
+  <li>自動で行う基本的な本編／CM 判定では、不十分な場合があるので、
+それを補助する為に番組毎に特有なパターンを登録して、
+本編／CM 判定の精度を上げる。</li>
+  <li>ユーザー定義マクロの適用例としては、下記のものがある。
+    <ul>
+      <li>CM と区別が付かない次回予告を本編にする。</li>
+      <li>番組冒頭のアイキャッチを CM にする。</li>
+      <li>5秒、10秒の番宣を CM にする。</li>
+      <li>本編判定されるTVショッピングを CM にする。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="マクロ定義の文法">マクロ定義の文法</h2>
+
+<ul>
+  <li>ファイル名は <code class="language-plaintext highlighter-rouge">macro.txt</code> で、置き場所は TS ファイルのある番組ディレクトリ</li>
+  <li>1行に 1定義を記述</li>
+  <li>定義は 範囲指定、条件、設定値の 3項目から成る
+    <table>
+  <tr>
+    <th> 範囲指定 </th> <th> 条件 </th>  <th> 設定値 </th>
+  </tr> 
+  <tr>
+    <td rowspan="3"> Cn </td>
+    <td> Sn </td>
+    <td rowspan="7"> CM or HON <br /> ( C or H に省略可 ) </td>
+  </tr>
+  <tr>
+    <td> UNImin-max ( UNI は U に省略可) </td>
+  </tr>
+  <tr>
+    <td> ADDmin-max ( ADD は A に省略可) </td>
+  </tr>
+
+  <tr>
+    <td rowspan="2"> Tmin-max </td>
+    <td> UNImin-max ( UNI は U に省略可) </td>
+  </tr>
+  <tr>
+    <td> ADDmin-max ( ADD は A に省略可) </td>
+  </tr>
+</table>
+  </li>
+  <li>
+    <p>各項目の説明</p>
+
+    <table>
+      <tbody>
+        <tr>
+          <td>Cn</td>
+          <td>n番目のチャプター (nは整数)を対象にする</td>
+        </tr>
+        <tr>
+          <td>Sn</td>
+          <td>n番目のセクション</td>
+        </tr>
+        <tr>
+          <td>T</td>
+          <td>指定した範囲の時間を対象にする</td>
+        </tr>
+        <tr>
+          <td>min-max</td>
+          <td>開始-終了時間  秒(0.0-3600.0) 又は分：秒(00:00-60:00) 形式</td>
+        </tr>
+        <tr>
+          <td>ADD</td>
+          <td>連続したセクションの合計値が、指定した時間の範囲に収まったら真</td>
+        </tr>
+        <tr>
+          <td>UNI</td>
+          <td>セクション単体の値が、指定した時間の範囲に収まったら真</td>
+        </tr>
+        <tr>
+          <td>CM</td>
+          <td>条件に一致したセクションを CM に設定する。</td>
+        </tr>
+        <tr>
+          <td>HON</td>
+          <td>条件に一致したセクションを 本編 に設定する。</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>各項目は空白文字(スペース、タブ)で区切る</li>
+  <li>行頭が # の場合はコメント行とする。</li>
+  <li>ユーザー定義マクロが適用されるのは、デフォルトのルールが適用された後で、
+ユーザー定義マクロの判定中は、チャプター番号、セクション番号は、変動しない。</li>
+  <li>見やすくするために ‘'’_ ‘’’ を挿入しても良い。なお全ての ‘'’_ ‘’’ は無視される。
+    <pre>
+ T_50:00-59:00  UNI_0-999  CM
+</pre>
+  </li>
+</ul>
+
+<h2 id="使用例">使用例</h2>
+
+<ul>
+  <li>第2チャプターの第1セクションをCM にする。
+    <pre>
+C2   S1   CM
+</pre>
+  </li>
+  <li>50:00 から 59:00 までは全て CM にする。
+    <pre>
+T50:00-59:00  UNI0-999  CM
+</pre>
+  </li>
+  <li>0:00 から 60:00 の間の、10秒±0.5 は全て CM にする。
+    <pre>
+T_0:00-60:00  UNI_9.5-10.5  CM
+</pre>
+  </li>
+  <li>最後の方にある 5分のTVショッピングを CM にする。
+    <pre>
+T_45:00-60:00  A_299.5-300.5  CM
+</pre>
+  </li>
+</ul>
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

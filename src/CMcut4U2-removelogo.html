@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>CMcut4U2 のロゴ消し機能 | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="CMcut4U2 のロゴ消し機能" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="CMcut4U2 のロゴ消し機能" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"CMcut4U2 のロゴ消し機能","url":"/src/CMcut4U2-removelogo.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0d49ac7ca150bec34910d8da840a0b5b050f48f4">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="はじめに">はじめに</h2>
+
+<p>CMcut4U2 Ver 0.3.0 で追加されたロゴ消し機能についての説明です。</p>
+
+<h2 id="使い方の概略">使い方の概略</h2>
+
+<ol>
+  <li>config.rb に Ver 0.3.0 で<a href="#config">追加された定数</a>を追記する。</li>
+  <li>あらかじめ、放送局毎にロゴのマスクデータを作成しておく。<a href="#logomask">作り方は後述</a></li>
+  <li>番組毎にパラメータ設定ダイアログで、上記のロゴのマスクデータを指定する。
+また、必要ならばぼかしフィルターを選択する。</li>
+</ol>
+
+<p>以上で、エンコード時に ffmpeg の removelogo + ぼかしフィルター処理を実行する。
+<br /></p>
+
+<ul>
+  <li>ロゴのマスクデータを指定した時のみ、ぼかしフィルターは有効になる。</li>
+  <li>フィルタチェインは下記の様なものになる。</li>
+</ul>
+<pre>
+-vf split[a][b],[a]removelogo=ABCD-194x101+1220+30.png[a1],[a1]crop=194:101:1220:30[a2],[a2]unsharp=5:5:-1.0:5:5:-1.0[a3],[b][a3]overlay=1220:30
+</pre>
+
+<h2 id="configrb-に追加された定数-">config.rb に追加された定数 <a name="config"></a></h2>
+
+<pre>
+RmLogoDir      = Top + "/rmlogo"
+RmLogoBlurList = {
+  :null      =&gt; "null",                        # 素通し
+  :smartblur1 =&gt; "smartblur=1:1:0:1:1:0",
+  :smartblur2 =&gt; "smartblur=2:1:0:2:1:0",
+  :unsharp1   =&gt; "unsharp=5:5:-1.0:5:5:-1.0",
+  :unsharp2   =&gt; "unsharp=7:7:-1.5:7:7:-1.5",
+  }
+RmLogoBlurDefault = :unsharp1
+</pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>定数名</th>
+      <th>意味</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>RmLogoDir</td>
+      <td>ロゴのマスクデータを格納するディレクトリ</td>
+    </tr>
+    <tr>
+      <td>RmLogoBlurList</td>
+      <td>ぼかしフィルターのリスト。</td>
+    </tr>
+    <tr>
+      <td>RmLogoBlurDefault</td>
+      <td>RmLogoBlurList 中のからパラメータ設定ダイアログの初期値とするものを指定</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>リストの中身はカスタマイズ自由。</li>
+  <li>フィルターやパラメータの意味は ffmpeg のドキュメントを参照。
+    <ul>
+      <li><a href="https://ffmpeg.org/ffmpeg-filters.html#smartblur-1">smartblur</a></li>
+      <li><a href="https://ffmpeg.org/ffmpeg-filters.html#unsharp-1">unsharp</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="ロゴマスク画像ファイルの作成方法-">ロゴマスク画像ファイルの作成方法 <a name="logomask"></a></h2>
+
+<p>黒地にロゴしか入っていないロゴマスク画像ファイルを得るため、下記の作業を行う。</p>
+
+<ol>
+  <li>ロゴを採取する TSファイルを用意する。</li>
+  <li>上記の TSファイルの解像度を ffprobe で調べる。(下記の赤字の部分)</li>
+</ol>
+<pre>
+    % ffprobe TSファイル名
+    ....
+        Stream #0:1[0x111]: Video: mpeg2video (Main) ([2][0][0][0] / 0x0002), yu v420p(tv, bt709, top first), <strong>1440x1080</strong> [SAR 4:3 DAR 16:9], 29.97 fps, 29.97 tbr, 90k tbn, 59.94 tbc
+        Side data:
+          cpb: bitrate max/min/avg: 20000000/0/0 buffer size: 9781248 vbv_delay: N/A
+        Stream #0:2[0x112]: Audio: aac (LC) ([15][0][0][0] / 0x000F), 48000 Hz, stereo, fltp, 189 kb/s
+        Stream #0:3[0x114]: Subtitle: arib_caption (Profile A) ([6][0][0][0] / 0x0006)
+        Stream #0:4[0x115]: Data: bin_data ([6][0][0][0] / 0x0006)
+        Stream #0:5[0x840]: Unknown: none ([13][0][0][0] / 0x000D)
+    ....
+</pre>
+
+<ol>
+  <li>TS ファイルを mpv 等のプレイヤーで再生し、
+ロゴが鮮明に見えるタイミングで、スクリーンショットをとる。</li>
+  <li>スクリーンショットの画像を gimp で編集する。
+    <ol>
+      <li>解像度が TS ファイルのものと異なる場合は、TSファイルの解像度に合わせる。
+<br />
+「画像」→「画像の拡大・縮小」</li>
+      <li>グレイスケールに変換する。
+<br />
+「画像」→「モード」→「グレイスケール」</li>
+      <li>ロゴの部分以外を黒(#000000) で塗りつぶす。
+ <br />
+        <ol>
+          <li>ロゴの部分を矩形領域で選択。</li>
+          <li>「選択」→「選択範囲の反転」</li>
+          <li>「編集」→「描画色で塗りつぶす」</li>
+        </ol>
+      </li>
+      <li>適当なフィルタや描画ツールを使って、ロゴの周辺をきれいに整形する。</li>
+      <li>ぼかしフィルターの為にロゴの位置情報を調べる。
+<br />
+ロゴを矩形選択で囲む。→
+ツールオプションに座標データが表示されているのでそれをメモしておく。
+必要なものは、左上の座標と、高さ×幅で、
+この部分にぼかしフィルターが掛けられる。</li>
+      <li>
+        <p>png ファイルを出力する。
+<br />
+「ファイル」→「名前を付けてエクスポート」→
+ファイル名を指定してエクスポート
+<br />
+ファイル名は、次の書式にする。</p>
+
+        <table>
+          <tbody>
+            <tr>
+              <td>画像フォーマット</td>
+              <td>png グレイスケールを推奨 (他の形式は動作未確認)</td>
+            </tr>
+            <tr>
+              <td>書式</td>
+              <td>ABCDEFG-WxH+X+Y.png</td>
+            </tr>
+            <tr>
+              <td>例</td>
+              <td>TBS-113x30+1868+66.png</td>
+            </tr>
+            <tr>
+              <td>ABCDEFG</td>
+              <td>任意の文字列(ただし <code class="language-plaintext highlighter-rouge">:</code>は避ける)</td>
+            </tr>
+            <tr>
+              <td>W , H</td>
+              <td>ロゴの幅、高さ (整数)</td>
+            </tr>
+            <tr>
+              <td>X , Y</td>
+              <td>ロゴの左上の位置(整数)</td>
+            </tr>
+            <tr>
+              <td>置き場所</td>
+              <td>RmLogoDir で指定したディレクトリ</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+      <li>確認
+<br />
+  作成したマスク画像ファイルを確認するには下記のコマンドを実行する。
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  ffplay -i TSファイル -vf removelogo=マスク画像ファイル名
+</code></pre></div>        </div>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<h3 id="注意点">注意点</h3>
+<ol>
+  <li>ロゴの位置情報は、使用するぼかしフィルターによるが、ロゴより一回り大きくとると良い?</li>
+  <li>放送局によっては、ロゴに陰影を付けているものがある。
+その場合は影の部分もロゴの領域としなければならない。</li>
+</ol>
+
+<h2 id="参考-link">参考 Link</h2>
+<ul>
+  <li><a href="https://nico-lab.net/removelogo_for_high_quality_with_ffmpeg/">FFMPEG できれいにロゴを消す方法</a></li>
+  <li><a href="https://ffmpeg.org/documentation.html">FFmpeg Documentation</a></li>
+</ul>
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
