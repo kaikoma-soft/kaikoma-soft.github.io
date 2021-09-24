@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>raspirec 録画自動延長機能 | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="raspirec 録画自動延長機能" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="raspirec 録画自動延長機能" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"raspirec 録画自動延長機能","url":"/src/raspirec-RecExt.html","author":{"@type":"Person","name":"kaikoma-soft"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="はじめに">はじめに</h2>
+
+<p>ここでは、<a href="https://github.com/kaikoma-soft/raspirec" target="_blank">raspirec</a>
+のオプション機能で、Ver1.3.0
+から導入された「録画自動延長機能」について説明します。</p>
+
+<h2 id="録画自動延長機能とは">録画自動延長機能とは</h2>
+
+<p>録画中の番組が延長になった場合に、録画終了時間を自動的に延長するものです。
+<br />
+なお、この機能が動作する為には、
+番組終了 90秒前に EPG 情報が更新されている必要があります。</p>
+
+<h2 id="必要な環境">必要な環境</h2>
+<ul>
+  <li>raspirec (Ver1.3.0 以上) であること。</li>
+  <li>config.rb で、機能を有効にしている事。(下記の設定を参照)</li>
+  <li>recpt1, epgdump はオリジナルではなく下記の改造版であること。
+    <ul>
+      <li><a href="https://github.com/kaikoma-soft/recpt1" target="_blank">recpt1</a>
+( <code class="language-plaintext highlighter-rouge">--sid</code> オプション指定時に EPG データが欠落するのを防ぐ )</li>
+      <li><a href="https://github.com/kaikoma-soft/epgdump" target="_blank">epgdump</a>
+( 入力の TSファイルの最後の部分だけからEPG を抽出する <code class="language-plaintext highlighter-rouge">--tail</code> オプションの追加)</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="注意点">注意点</h2>
+<ul>
+  <li>延長が起きた結果、チューナー不足が起きる可能性があります。
+その場合、後発番組の録画が失敗します。<br />
+→ チューナーは余裕をもった数を用意しましょう。</li>
+  <li>放送局側の EPGの更新が当初の番組終了時間 90秒前までに出来なかった場合は、
+終了時間の延長はされません。</li>
+  <li>延長時間の最大値は、放送時間と同じです。( 1時間番組は ＋1時間の 計 2時間まで )</li>
+  <li>録画中のバックグラウンドで EPG処理を行うので、Total_tuner_limit
+で制限を掛けるような非力なマシンでは、録画に影響が出る可能性が有ります。</li>
+</ul>
+
+<h2 id="設定">設定</h2>
+
+<h3 id="configrb-の記述例">config.rb の記述例</h3>
+<pre>
+#
+#   自動録画延長 (ver1.3.0 以降)
+#
+AutoRecExt        = true               # 自動録画延長機能  true = 有効
+ARE_sampling_time = 90                 # 番組終了の n 秒前に EPG 採取
+ARE_epgdump_opt   = %W( --tail 50M )   # 最後尾切り出しの epgdump のオプション
+</pre>
+
+<h3 id="configrb-の説明">config.rb の説明</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>キー</th>
+      <th>デフォルト値</th>
+      <th>説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>AutoRecExt</td>
+      <td>false</td>
+      <td>true = 自動録画延長機能を有効する</td>
+    </tr>
+    <tr>
+      <td>ARE_sampling_time</td>
+      <td>90</td>
+      <td>番組終了の n 秒前に EPG 採取</td>
+    </tr>
+    <tr>
+      <td>ARE_epgdump_opt</td>
+      <td>–tail 50M</td>
+      <td>epgdump のオプション で、TSファイルの最後の部分 <br /> 50Mbyte から EPG データを取り出す。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="リンク">リンク</h2>
+
+<ul>
+  <li><a href="https://kaikoma-soft.github.io/src/raspirec.html" target="_blank">raspirec ドキュメント</a></li>
+  <li><a href="https://github.com/kaikoma-soft/raspirec" target="_blank">gitHub raspirec</a></li>
+  <li><a href="https://github.com/kaikoma-soft/recpt1" target="_blank">gitHub recpt1</a></li>
+  <li><a href="https://github.com/kaikoma-soft/recdvb" target="_blank">gitHub recdvb</a></li>
+  <li><a href="https://github.com/kaikoma-soft/epgdump" target="_blank">gitHub epgdump</a></li>
+</ul>
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
