@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>本をスキャナーで、スキャンし、圧縮処理までバッチ的に行うプログラム | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.3" />
+<meta property="og:title" content="本をスキャナーで、スキャンし、圧縮処理までバッチ的に行うプログラム" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="本をスキャナーで、スキャンし、圧縮処理までバッチ的に行うプログラム" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"kaikoma-soft","url":"https://github.com/kaikoma-soft"},"headline":"本をスキャナーで、スキャンし、圧縮処理までバッチ的に行うプログラム","url":"/src/bookScan.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h2 id="開発の目的">開発の目的</h2>
+
+<p>数千冊の本を自炊で電子化するために、出来るだけ短TAT かつ省力化をするための
+スキャンから圧縮処理までをバッチ的に行うプログラムを作成する。</p>
+
+<p>目標 ： 300ページの文庫本を一冊処理(裁断は除き、スキャンから圧縮まで)するのに
+5分、閲覧用のファイルサイズを 20Mbyte とする。</p>
+
+<!--more-->
+
+<h2 id="特徴">特徴</h2>
+
+<ul>
+  <li>スキャンから 最終出力までを Linux 上で、バッチ的に実行する。</li>
+  <li>出力は、閲覧用と原本保管用の 2種類を出力とする。
+    <ul>
+      <li>原本とは、スキャンしたデータそのままのもの。</li>
+      <li>閲覧用とは、ファイルサイズを出来るだけ小さくするため処理を掛けたもの。</li>
+    </ul>
+  </li>
+  <li>古い文庫本は酸性紙が使われていて黄ばみが起きる。
+そのままだとコントラストが低下するので、自動的にトーンカーブを調節する機能。</li>
+  <li>解像度を有効に使うために、テキストのみのページは周囲の余白を検出して
+削除する機能。</li>
+  <li>テキストのみのページは、階調数が少なくても良いので、階調を 4bit にして
+ファイルサイズを圧縮する。</li>
+  <li>画像(濃淡があるもの)は、cjpeg(mozjpeg) を使って圧縮する。</li>
+  <li>カバー裏にある ISBN番号(バーコード又は文字列)を読み取り、国立国会図書館サーチ
+から書誌情報を取得しファイル名を生成する。</li>
+</ul>
+
+<h2 id="インストール方法">インストール方法</h2>
+
+<h3 id="本体以外に必要なパッケージ">本体以外に必要なパッケージ</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>名称</th>
+      <th>説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>git</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>ruby</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>xsane</td>
+      <td>Scanner Access Now Easy</td>
+    </tr>
+    <tr>
+      <td>epsonscan2</td>
+      <td>EPSON DS-570W 用ドライバー  (*1)</td>
+    </tr>
+    <tr>
+      <td>imagemagick</td>
+      <td>画像処理いろいろ</td>
+    </tr>
+    <tr>
+      <td>libjpeg-turbo-progs</td>
+      <td>mozjpeg 画像圧縮用</td>
+    </tr>
+    <tr>
+      <td>gimv</td>
+      <td>gimageview (*2) スキャン後に、テキストと画像に分類する</td>
+    </tr>
+    <tr>
+      <td>pinta</td>
+      <td>カバーの加工用</td>
+    </tr>
+    <tr>
+      <td>zbar-tools</td>
+      <td>カバーの ISBN バーコード読み取り</td>
+    </tr>
+    <tr>
+      <td>tesseract-ocr-jpn</td>
+      <td>カバーの ISBN 番号の OCR</td>
+    </tr>
+    <tr>
+      <td>w3m</td>
+      <td>ISBN番号から書誌情報の検索</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>特殊なもの以外は、下記のコマンドでインストールする。
+( OS は ubuntu を想定。) <br />
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% sudo apt install git ruby xsane imagemagick libjpeg-turbo-progs pinta zbar-tools tesseract-ocr-jpn w3m
+</code></pre></div>    </div>
+  </li>
+  <li>EPSON DS-570W 用ドライバー (*1)<br />
+使用しているスキャナーは EPSON DS-571W だが、EPSONのサイト
+https://www.epson.jp/support/taiou/os/linux_selist.htm
+には、DS-571W は無いので、代わりに DS-570W 用をインストールする。
+すると標準ドライバーでは使えない DS-571 特有のオプションが使えるよう
+になる。
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% scanimage -d "epsonscan2:DS-571W:003:026:esci2:usb:ES0238:392" --help
+</code></pre></div>    </div>
+  </li>
+  <li>gimv (*2)
+標準パッケージには無いので、PPA を登録してインストールする。
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% sudo add-apt-repository ppa:kakurasan/misc
+% sudo sudo apt update
+% sudo apt install gimageview
+</code></pre></div>    </div>
+    <p>または、ソースからコンパイルしてインストールする。</p>
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% mkdir /tmp/gimv
+% cd /tmp/gimv
+% git clone  https://github.com/ashie/gimageview.git .
+% sh autogen.sh
+% ./configure
+% make
+% sudo make install
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="本体">本体</h3>
+
+<ul>
+  <li>
+    <p>インストールするディレクトリに移動して下記のコマンドを実行する。<br />
+   <code class="language-plaintext highlighter-rouge">% git clone https://github.com/kaikoma-soft/bookScan.git .</code></p>
+  </li>
+  <li>
+    <p>上記のディレクトリを PATH に追加する。</p>
+  </li>
+</ul>
+
+<h2 id="使用方法">使用方法</h2>
+
+<ul>
+  <li>作業ディレクトリにて、下記のコマンドを実行する。
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> % book_scan.rb
+</code></pre></div>    </div>
+  </li>
+  <li></li>
+</ul>
+
+<h2 id="オプションの説明">オプションの説明</h2>
+
+<h5 id="-l-left">-l, –left</h5>
+<p>左とじの書籍の場合に指定する。カバー全体から表紙を切り出す際に右側を切り出すようにする。デフォルトは左側。</p>
+
+<h2 id="動作確認環境">動作確認環境</h2>
+
+<table>
+  <tbody>
+    <tr>
+      <td>OS</td>
+      <td>Ubuntu 21.10</td>
+    </tr>
+    <tr>
+      <td>スキャナー</td>
+      <td>EPSON DS-571W</td>
+    </tr>
+    <tr>
+      <td>epsonscan2</td>
+      <td>epsonscan2-bundle-6.6.40.0.x86_64.deb.tar.gz</td>
+    </tr>
+    <tr>
+      <td>ruby</td>
+      <td>ruby 2.7.4p191</td>
+    </tr>
+    <tr>
+      <td>scanimage (sane-backends)</td>
+      <td>1.0.32</td>
+    </tr>
+    <tr>
+      <td>ImageMagick</td>
+      <td>6.9.11-60</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="連絡先">連絡先</h2>
+
+<p>不具合報告などは、
+<a href="https://github.com/kaikoma-soft/seesaw/issues">GitHub issuse</a>
+の方にお願いします。</p>
+
+<h2 id="リンク">リンク</h2>
+
+<ul>
+  <li><a href="http://www.asahi-net.or.jp/~sy8y-siy/src/seesaw.html" target="_blank">ナマケモノの家 seesaw</a></li>
+  <li><a href="https://github.com/kaikoma-soft/seesaw" target="_blank">gitHub seesaw</a></li>
+  <li><a href="https://kaikoma-soft.github.io/src/seesaw.html" target="_blank">gitHub Pages seesaw</a></li>
+</ul>
+
+<h2 id="ライセンス">ライセンス</h2>
+<p>このソフトウェアは、Apache License Version 2.0 ライセンスのも
+とで公開します。詳しくは LICENSE を見て下さい。</p>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

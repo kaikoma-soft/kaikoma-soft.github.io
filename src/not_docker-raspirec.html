@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>raspirec の動作テストを行う docker 環境 | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.3" />
+<meta property="og:title" content="raspirec の動作テストを行う docker 環境" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="raspirec の動作テストを行う docker 環境" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"kaikoma-soft","url":"https://github.com/kaikoma-soft"},"headline":"raspirec の動作テストを行う docker 環境","url":"/src/not_docker-raspirec.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h1 id="現環境にインストールする方法-">現環境にインストールする方法 <a name="current_environment"></a></h1>
+
+<p>docker環境を使わずに現環境にプログラム一式をインストールする方法は次の通りです。</p>
+
+<h2 id="インストール手順-">インストール手順 <a name="install"></a></h2>
+
+<ul>
+  <li>作業用ディレクトリを作成し、ソース一式をダウンロード
+    <pre>
+% mkdir tmp
+% cd tmp
+% git clone --depth=1 https://github.com/kaikoma-soft/docker-raspirec.git .
+</pre>
+  </li>
+  <li>setting.sh 中の変数 DOCKER を no に変更する。
+その他のパラメータは適宜変更する。
+    <pre>
+ export DOCKER="no"     # docker にインストールするか yes/no
+</pre>
+  </li>
+  <li>インストールスクリプトを実行する。(要 sudo )
+    <pre>
+% sh ./build.sh
+</pre>
+    <ul>
+      <li>インストールされるプログラム、ライブラリは次のものです。
+(ドラーバーは含みません。)</li>
+    </ul>
+    <table>
+  <tr>
+    <th> 名称</th>
+    <th> インストール先  </th>
+    <th> 備考 </th>
+  </tr>
+  <tr>
+    <td> raspirec </td>
+    <td> /usr/local/raspirec </td>
+    <td> config.rb は $HOME/raspirec </td>
+  </tr>
+  <tr>
+    <td> recpt1 </td>
+    <td> /usr/local/bin </td>
+    <td>  </td>
+  </tr>
+  <tr>
+    <td> recdvb </td>
+    <td> /usr/local/bin </td>
+    <td>  </td>
+  </tr>
+  <tr>
+    <td> epgdump </td>
+    <td> /usr/local/bin </td>
+    <td>  </td>
+  </tr>
+  <tr>
+    <td> tspacketchk </td>
+    <td> /usr/local/bin </td>
+    <td>  </td>
+  </tr>
+  <tr>
+    <td> libarib25 or libaribb25 </td>
+    <td> /usr/local/lib, /usr/local/bin, /usr/local/include </td>
+    <td>  </td>
+  </tr>
+  <tr>
+    <td> libyakisoba (オプション) </td>
+    <td> /usr/local/lib, /usr/local/include/libsobacas </td>
+    <td> キーファイルは /usr/local/etc </td>
+  </tr>
+</table>
+  </li>
+  <li>$HOME/raspirecに raspirec が参照する config.rb が作成されるので、
+それをエディタで適切な値に書き換える。
+<br />
+最低限必須なのは次のもの。詳細は
+<a href="https://github.com/kaikoma-soft/raspirec/blob/master/doc/config.md">doc/config.md</a> を参照
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> GR_EPG_channel    : 地デジ EPG 受信局を設定する。
+ GR_tuner_num      : 地デジチュナー数
+ BSCS_tuner_num    : BSCSチュナー数
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="起動">起動</h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   % sh $HOME/raspirec/raspirec.sh start
+</code></pre></div></div>
+
+<h2 id="webアクセス">WEBアクセス</h2>
+<p>WEB ブラウザで、http://localhost:45678/ へアクセスする。</p>
+
+<h2 id="停止">停止</h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   % sh $HOME/raspirec/raspirec.sh stop
+</code></pre></div></div>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
