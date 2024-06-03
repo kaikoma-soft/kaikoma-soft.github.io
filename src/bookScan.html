@@ -157,14 +157,14 @@ https://www.epson.jp/support/taiou/os/linux_selist.htm
 になる。
     <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% scanimage -d "epsonscan2:DS-571W:003:026:esci2:usb:ES0238:392" --help
 </code></pre></div>    </div>
+
+    <p>メモ<br />
+epsonscan2-bundle-6.6.40.0.x86_64.deb では、期待通りに動作するが、
+epsonscan2-bundle-6.7.61.0.x86_64.deb だと、
+<code class="language-plaintext highlighter-rouge">--scan-area=Auto Detect</code> が動作しない。</p>
   </li>
   <li>gimv (*2)
-標準パッケージには無いので、PPA を登録してインストールする。
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% sudo add-apt-repository ppa:kakurasan/misc
-% sudo sudo apt update
-% sudo apt install gimageview
-</code></pre></div>    </div>
-    <p>または、ソースからコンパイルしてインストールする。</p>
+標準パッケージには無いので、ソースからコンパイルしてインストールする。
     <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% mkdir /tmp/gimv
 % cd /tmp/gimv
 % git clone  https://github.com/ashie/gimageview.git .
@@ -203,13 +203,17 @@ https://www.epson.jp/support/taiou/os/linux_selist.htm
 <h5 id="-l-left">-l, –left</h5>
 <p>左とじの書籍の場合に指定する。カバー全体から表紙を切り出す際に右側を切り出すようにする。デフォルトは左側。</p>
 
+<h5 id="-r-dropout_red">-R, –dropout_Red</h5>
+<p>黄ばみ対策として、グレイスケールのスキャン時に <code class="language-plaintext highlighter-rouge">--dropout=Red</code>
+  を付加する。</p>
+
 <h2 id="動作確認環境">動作確認環境</h2>
 
 <table>
   <tbody>
     <tr>
       <td>OS</td>
-      <td>Ubuntu 21.10</td>
+      <td>Ubuntu 22.04.2 LTS (Jammy Jellyfish)</td>
     </tr>
     <tr>
       <td>スキャナー</td>
@@ -221,11 +225,11 @@ https://www.epson.jp/support/taiou/os/linux_selist.htm
     </tr>
     <tr>
       <td>ruby</td>
-      <td>ruby 2.7.4p191</td>
+      <td>ruby  3.0.2p107</td>
     </tr>
     <tr>
       <td>scanimage (sane-backends)</td>
-      <td>1.0.32</td>
+      <td>1.1.1-debian; backend version 1.1.1</td>
     </tr>
     <tr>
       <td>ImageMagick</td>
@@ -237,7 +241,7 @@ https://www.epson.jp/support/taiou/os/linux_selist.htm
 <h2 id="連絡先">連絡先</h2>
 
 <p>不具合報告などは、
-<a href="https://github.com/kaikoma-soft/seesaw/issues">GitHub issuse</a>
+<a href="https://github.com/kaikoma-soft/bookScan/issues">GitHub issuse</a>
 の方にお願いします。</p>
 
 <h2 id="リンク">リンク</h2>

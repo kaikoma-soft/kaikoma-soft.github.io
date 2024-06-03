@@ -135,7 +135,7 @@ OK ならば、TSファイル、作業ファイルを削除して、終了とす
 <ul>
   <li>Ubuntu 18.04.1 LTS (多分Unix系ならなんでも)</li>
   <li>ruby  2.5.1 以上</li>
-  <li>ruby-gtk2 3.2.4</li>
+  <li>ruby-gtk3</li>
   <li>ruby-wave</li>
   <li>python 2.7 以上</li>
   <li>Opencv 3.4.1</li>
@@ -153,7 +153,7 @@ OK ならば、TSファイル、作業ファイルを削除して、終了とす
 
 <h3 id="ruby">ruby</h3>
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% sudo apt install ruby
-% sudo apt install ruby-gtk2
+% sudo apt install ruby-gtk3
 % sudo gem install wav-file
 </code></pre></div></div>
 
@@ -412,7 +412,8 @@ OK ならば、TSファイル、作業ファイルを削除して、終了とす
  最小限の大きさで矩形領域の切り抜き
  (「ツール」-&gt; 「変形ツール」-&gt; 「切り抜き」)をする。</li>
       <li>「画像」-&gt; 「モード」-&gt; 「グレイスケール」で、グレイスケール化する。</li>
-      <li>logo ディレクトリの下に、名前を付けて画像を保存する。</li>
+      <li>logo ディレクトリの下に、名前を付けて画像を保存(エクスポート)する。
+その時の画像フォーマットは、PNG 8bit グレイスケールでアルファチャンネルは無し。</li>
     </ol>
   </li>
 </ol>
