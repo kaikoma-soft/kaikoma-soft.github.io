@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバーの構築 2024年版 | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.9.3" />
+<meta property="og:title" content="Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバーの構築 2024年版" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバーの構築 2024年版" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"kaikoma-soft","url":"https://github.com/kaikoma-soft"},"headline":"Raspberry Pi 3B+ ＋ PX-Q3U4 で録画サーバーの構築 2024年版","url":"/src/raspirec_install_2024.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h1 id="はじめに">はじめに</h1>
+
+<p>2024/06 現在の最新である bookworm 64bit で、raspirec が動作するかの検証を行う。</p>
+
+<ul>
+  <li>
+    <p>条件</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>値</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SBC</td>
+          <td>Raspberry Pi 3B+</td>
+        </tr>
+        <tr>
+          <td>OS</td>
+          <td>Raspberry Pi OS Lite (64-bit bookworm )</td>
+        </tr>
+        <tr>
+          <td>チューナー</td>
+          <td>PX-Q3U4</td>
+        </tr>
+        <tr>
+          <td>ドライバー</td>
+          <td>px4_drv</td>
+        </tr>
+        <tr>
+          <td>録画ソフト</td>
+          <td>raspirec  Ver1.4.4</td>
+        </tr>
+        <tr>
+          <td>実施日</td>
+          <td>2024/06/26</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ul>
+
+<h1 id="os-インストール">OS インストール</h1>
+
+<ol>
+  <li>
+    <p>OS のインストールは、
+ <a href="https://www.raspberrypi.com/software/">公式ページ</a>
+ から インストーラーをdownload して普通に行う。</p>
+
+    <ul>
+      <li>有線LAN (インストール時に固定IPは出来ない。dhcp 必須。後で変更)</li>
+      <li>SSH 有効</li>
+    </ul>
+  </li>
+  <li>
+    <p>OS のアップデート</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo apt update 
+$ sudo apt upgrade
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>録画サーバーなので、IPアドレスを固定とする。</p>
+
+    <table>
+ <tr> <td> 自アドレス </td> <td>192.168.1.7/24 </td></tr>
+ <tr> <td> gateway </td> <td> 192.168.1.1</td></tr>
+ <tr> <td> DNS </td> <td> 192.168.1.64,8.8.8.8</td></tr>
+ </table>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ nmcli connection show
+ $ sudo nmcli connection modify "Wired connection 1" ipv4.addresses 192.168.1.7/24
+ $ sudo nmcli connection modify "Wired connection 1" ipv4.gateway 192.168.1.1
+ $ sudo nmcli connection modify "Wired connection 1" ipv4.dns 192.168.1.64,8.8.8.8
+ $ sudo nmcli connection modify "Wired connection 1" ipv4.method manual
+ $ sudo nmcli connection up "Wired connection 1"
+</code></pre></div>    </div>
+    <ul>
+      <li>“Wired connection 1” は、nmcli connection show で出てきた NAME</li>
+      <li>up と同時に IP が変わるので接続が切れる。</li>
+    </ul>
+  </li>
+  <li>
+    <p>mail の設定 (smtpサーバーに投げるだけ)</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt install msmtp-mta msmtp
+</code></pre></div>    </div>
+    <p>の後 /etc/msmtprc を適宜設定</p>
+  </li>
+  <li>
+    <p>ntp(chrony) の設定</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt install chrony
+</code></pre></div>    </div>
+    <p>の後 /etc/chrony/chrony.conf を適宜設定</p>
+  </li>
+</ol>
+
+<h1 id="px4_drv-ドライバー-のインストール">px4_drv ドライバー のインストール</h1>
+
+<p>オリジナルの <a href="https://github.com/nns779/px4_drv">nns779/px4_drv</a> は
+最新のカーネルに対応していない為、有志によりメンテナスされている
+<a href="https://github.com/tsukumijima/px4_drv">tsukumijima/px4_drv</a>
+をインストールする。 (詳細はそちらのドキュメントを参照のこと)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ wget https://github.com/tsukumijima/px4_drv/releases/download/v0.4.4/px4-drv-dkms_0.4.4_all.deb
+$ sudo apt install -y ./px4-drv-dkms_0.4.4_all.deb``
+$ sudo modprobe px4_drv
+$ lsmod | grep px4
+</code></pre></div></div>
+<p>この時下記のエラーメッセージが出るが、無視する。</p>
+<blockquote>
+  <p>N: Download is performed unsandboxed as root as file ‘/home/shiiya/px4-drv-dkms_0.4.4_all.deb’ couldn’t be accessed by user ‘_apt’. - pkgAcquire::Run (13: Permission denied)</p>
+</blockquote>
+
+<p>デバイスファイルの確認をして出来ていれば OK</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pi:~ $ ls -l /dev/px4video*
+crw-rw-r-- 1 root video 236, 0 Jun 26 10:10 /dev/px4video0
+crw-rw-r-- 1 root video 236, 1 Jun 26 10:10 /dev/px4video1
+crw-rw-r-- 1 root video 236, 2 Jun 26 10:10 /dev/px4video2
+crw-rw-r-- 1 root video 236, 3 Jun 26 10:10 /dev/px4video3
+crw-rw-r-- 1 root video 236, 4 Jun 26 10:10 /dev/px4video4
+crw-rw-r-- 1 root video 236, 5 Jun 26 10:10 /dev/px4video5
+crw-rw-r-- 1 root video 236, 6 Jun 26 10:10 /dev/px4video6
+crw-rw-r-- 1 root video 236, 7 Jun 26 10:10 /dev/px4video7
+</code></pre></div></div>
+
+<h1 id="raspirec-一式のインストール">raspirec 一式のインストール</h1>
+
+<p><a href="https://www.asahi-net.or.jp/~sy8y-siy/src/not_docker-raspirec.html">raspirec をdockerを使わずに現環境にインストールする方法</a>
+を使って、raspirec 及び必要なソフトウエアをインストールするスクリプトを実行する。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo apt install git
+</code></pre></div></div>
+<p>後は、インストール手順に従ってインストールする。</p>
+
+<h2 id="動作チェック">動作チェック</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>結果</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>recpt1</td>
+      <td>OK</td>
+    </tr>
+    <tr>
+      <td>tspacketchk</td>
+      <td>OK</td>
+    </tr>
+    <tr>
+      <td>raspirec 起動</td>
+      <td>OK</td>
+    </tr>
+    <tr>
+      <td>raspirec EPG取得</td>
+      <td>OK</td>
+    </tr>
+    <tr>
+      <td>raspirec 録画</td>
+      <td>OK</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="残された課題">残された課題</h1>
+
+<ul>
+  <li>
+    <p>SDカードでの本格運用は避けた方が良いので、外付け USB HDD を接続して、
+boot 以外のパーティションを移行させる。</p>
+  </li>
+  <li>
+    <p>不要なサービスや、カーネルモジュールを削除して、ダイエットを計る。</p>
+  </li>
+</ul>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
