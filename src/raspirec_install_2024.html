@@ -144,7 +144,7 @@ $ sudo apt upgrade
 
     <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt install msmtp-mta msmtp
 </code></pre></div>    </div>
-    <p>の後 /etc/msmtprc を適宜設定</p>
+    <p>の後 ~/.msmtprc を適宜設定</p>
   </li>
   <li>
     <p>ntp(chrony) の設定</p>
@@ -152,6 +152,15 @@ $ sudo apt upgrade
     <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt install chrony
 </code></pre></div>    </div>
     <p>の後 /etc/chrony/chrony.conf を適宜設定</p>
+  </li>
+  <li>
+    <p>ロケールの設定</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo raspi-config
+  1. 5 Localisation Options
+    1. L1 Locale       Configure language and regional settings
+</code></pre></div>    </div>
+    <p>で設定を行う。</p>
   </li>
 </ol>
 
@@ -163,7 +172,7 @@ $ sudo apt upgrade
 をインストールする。 (詳細はそちらのドキュメントを参照のこと)</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ wget https://github.com/tsukumijima/px4_drv/releases/download/v0.4.4/px4-drv-dkms_0.4.4_all.deb
-$ sudo apt install -y ./px4-drv-dkms_0.4.4_all.deb``
+$ sudo apt install -y ./px4-drv-dkms_0.4.4_all.deb
 $ sudo modprobe px4_drv
 $ lsmod | grep px4
 </code></pre></div></div>
@@ -193,7 +202,7 @@ crw-rw-r-- 1 root video 236, 7 Jun 26 10:10 /dev/px4video7
 </code></pre></div></div>
 <p>後は、インストール手順に従ってインストールする。</p>
 
-<h2 id="動作チェック">動作チェック</h2>
+<h1 id="動作チェック">動作チェック</h1>
 
 <table>
   <thead>
@@ -223,8 +232,60 @@ crw-rw-r-- 1 root video 236, 7 Jun 26 10:10 /dev/px4video7
       <td>raspirec 録画</td>
       <td>OK</td>
     </tr>
+    <tr>
+      <td>raspirec scp転送</td>
+      <td>NG -&gt; OK (Ver1.4.5)</td>
+    </tr>
   </tbody>
 </table>
+
+<h1 id="限界チェック">限界チェック</h1>
+
+<h3 id="条件">条件</h3>
+<ul>
+  <li>Raspberry Pi 3B+ で、同時に何本まで録画可能か確認する。</li>
+  <li>録画時間は 30分で、コマンドラインから recpt1 を実行する。</li>
+  <li>録画した TSファイルを tspacketchk でチェックして drop が 1桁ならば OK とする。</li>
+</ul>
+
+<h3 id="結果">結果</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>同時録画本数</th>
+      <th>–b25 付き</th>
+      <th>–b25 無し</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>8 本</td>
+      <td>NG</td>
+      <td>NG</td>
+    </tr>
+    <tr>
+      <td>7 本</td>
+      <td>NG</td>
+      <td>NG</td>
+    </tr>
+    <tr>
+      <td>6 本</td>
+      <td>NG</td>
+      <td>OK</td>
+    </tr>
+    <tr>
+      <td>5 本</td>
+      <td>OK</td>
+      <td>OK</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="結論">結論</h3>
+<ul>
+  <li>–b25 無しの場合で、同時 6本まで可能。( Buster と同等。 )</li>
+</ul>
 
 <h1 id="残された課題">残された課題</h1>
 
