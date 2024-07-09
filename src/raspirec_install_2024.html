@@ -115,7 +115,7 @@
     <p>OS のアップデート</p>
 
     <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo apt update 
-$ sudo apt upgrade
+$ sudo apt -y upgrade
 </code></pre></div>    </div>
   </li>
   <li>
@@ -132,6 +132,7 @@ $ sudo apt upgrade
  $ sudo nmcli connection modify "Wired connection 1" ipv4.gateway 192.168.1.1
  $ sudo nmcli connection modify "Wired connection 1" ipv4.dns 192.168.1.64,8.8.8.8
  $ sudo nmcli connection modify "Wired connection 1" ipv4.method manual
+ $ sudo nmcli connection modify "Wired connection 1" ipv6.method disabled
  $ sudo nmcli connection up "Wired connection 1"
 </code></pre></div>    </div>
     <ul>
@@ -142,14 +143,14 @@ $ sudo apt upgrade
   <li>
     <p>mail の設定 (smtpサーバーに投げるだけ)</p>
 
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt install msmtp-mta msmtp
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt install -y msmtp-mta msmtp
 </code></pre></div>    </div>
     <p>の後 ~/.msmtprc を適宜設定</p>
   </li>
   <li>
     <p>ntp(chrony) の設定</p>
 
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt install chrony
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt -y install chrony
 </code></pre></div>    </div>
     <p>の後 /etc/chrony/chrony.conf を適宜設定</p>
   </li>
@@ -198,9 +199,75 @@ crw-rw-r-- 1 root video 236, 7 Jun 26 10:10 /dev/px4video7
 <p><a href="https://www.asahi-net.or.jp/~sy8y-siy/src/not_docker-raspirec.html">raspirec をdockerを使わずに現環境にインストールする方法</a>
 を使って、raspirec 及び必要なソフトウエアをインストールするスクリプトを実行する。</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo apt install git
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo apt -y install git
 </code></pre></div></div>
 <p>後は、インストール手順に従ってインストールする。</p>
+
+<h1 id="os-の不要なサービスの停止">OS の不要なサービスの停止</h1>
+
+<ol>
+  <li>
+    <p>systemd で不要なサービスを停止させ、軽量化を図る。</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> systemctl disable avahi-daemon.service
+ systemctl disable bluetooth.service 
+ systemctl disable cups.service 
+ systemctl disable dhcpcd.service 
+ systemctl disable hciuart.service 
+ systemctl disable triggerhappy.service
+ systemctl disable wifi-country.service
+ systemctl disable wpa_supplicant.service
+ systemctl disable ModemManager.service
+ systemctl list-units -t service
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>/boot/firmware/config.txt を修正する</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> #dtparam=audio=on              # コメントアウト
+ #camera_auto_detect=1          # コメントアウト
+ #dtoverlay=vc4-kms-v3d         # コメントアウト
+ #max_framebuffers=2            # コメントアウト
+ #disable_overscan=1            # コメントアウト
+ dtoverlay=disable-bt           # 追記
+ dtoverlay=disable-wifi         # 追記
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>/etc/modprobe.d/raspi-blacklist.conf に下記を設定</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> blacklist bcm2835_codec
+ blacklist bcm2835_isp
+ blacklist bcm2835_v4l2
+ blacklist ip_tables
+ blacklist ipv6
+ blacklist raspberrypi_gpiomem
+ blacklist sg
+ blacklist snd
+ blacklist snd_bcm2835
+ blacklist snd_timer
+ blacklist vc_sm_cma
+ blacklist videobuf2_memops
+ blacklist videodev
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>/boot/firmware/cmdline.txt にパラメータ追加</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo sed -i 's/$/ coherent_pool=4M dwc_otg.host_rx_fifo_size=768 ipv6.disable=1/'/boot/firmware/cmdline.txt 
+</code></pre></div>    </div>
+    <p>注： 以前は dwc_otg.host_rx_fifo_size=2048 だったが、最大値が 768 になったよう。</p>
+  </li>
+  <li>
+    <p>/etc/modprobe.d/px4_drv.conf に下記を設定</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> options px4_drv xfer_packets=51 urb_max_packets=816 max_urbs=6
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>最後に reboot</p>
+  </li>
+</ol>
 
 <h1 id="動作チェック">動作チェック</h1>
 
@@ -245,7 +312,42 @@ crw-rw-r-- 1 root video 236, 7 Jun 26 10:10 /dev/px4video7
 <ul>
   <li>Raspberry Pi 3B+ で、同時に何本まで録画可能か確認する。</li>
   <li>録画時間は 30分で、コマンドラインから recpt1 を実行する。</li>
-  <li>録画した TSファイルを tspacketchk でチェックして drop が 1桁ならば OK とする。</li>
+  <li>TSファイルの書き込み領域は、外付け USB HDD。</li>
+  <li>
+    <p>録画した TSファイルを tspacketchk でチェックして drop が 1桁ならば OK とする。</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  #!/bin/sh
+    
+  TIME=1800
+  OPT="--b25"
+  MAX=6
+    
+  n=1
+  rm -f *.ts *.log
+  for CH in 26 BS15_0 28 BS13_0  18 BS1_1 14 BS1_2
+  do
+      recpt1 $OPT $CH  $TIME ${CH}.ts &amp;
+      sleep 1
+      n=`expr $n + 1`
+      if [ $n -gt $MAX ]
+      then
+          break
+      fi
+  done
+    
+  date
+  ls -1 *.ts | wc -l
+  wait
+    
+  for fname in *.ts
+  do
+      echo $fname
+      tspacketchk $fname &gt; ${fname}.log
+  done
+    
+  grep drop+ *.log
+</code></pre></div>    </div>
+  </li>
 </ul>
 
 <h3 id="結果">結果</h3>
@@ -272,10 +374,15 @@ crw-rw-r-- 1 root video 236, 7 Jun 26 10:10 /dev/px4video7
     <tr>
       <td>6 本</td>
       <td>NG</td>
-      <td>OK</td>
+      <td>NG</td>
     </tr>
     <tr>
       <td>5 本</td>
+      <td>OK</td>
+      <td>OK</td>
+    </tr>
+    <tr>
+      <td>4 本</td>
       <td>OK</td>
       <td>OK</td>
     </tr>
@@ -284,19 +391,8 @@ crw-rw-r-- 1 root video 236, 7 Jun 26 10:10 /dev/px4video7
 
 <h3 id="結論">結論</h3>
 <ul>
-  <li>–b25 無しの場合で、同時 6本まで可能。( Buster と同等。 )</li>
-</ul>
-
-<h1 id="残された課題">残された課題</h1>
-
-<ul>
-  <li>
-    <p>SDカードでの本格運用は避けた方が良いので、外付け USB HDD を接続して、
-boot 以外のパーティションを移行させる。</p>
-  </li>
-  <li>
-    <p>不要なサービスや、カーネルモジュールを削除して、ダイエットを計る。</p>
-  </li>
+  <li>–b25 有り・無しの両方で、同時 5本まで可能。</li>
+  <li>Buster の時は 無しは 6本だったので、1本減少した。(USB HDD への書き込み速度が低下した感じ)</li>
 </ul>
 
 
