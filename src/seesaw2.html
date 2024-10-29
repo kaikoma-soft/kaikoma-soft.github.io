@@ -5,17 +5,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
 <!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Samba と連携して、Samba経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム | ナマケモノの家</title>
+<title>ftp(proftpd) と連携して、ftp経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム | ナマケモノの家</title>
 <meta name="generator" content="Jekyll v3.10.0" />
-<meta property="og:title" content="Samba と連携して、Samba経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム" />
+<meta property="og:title" content="ftp(proftpd) と連携して、ftp経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム" />
 <meta name="author" content="kaikoma-soft" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="ナマケモノの家" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Samba と連携して、Samba経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム" />
+<meta property="twitter:title" content="ftp(proftpd) と連携して、ftp経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"kaikoma-soft","url":"https://github.com/kaikoma-soft"},"headline":"Samba と連携して、Samba経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム","url":"/src/seesaw.html"}</script>
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"kaikoma-soft","url":"https://github.com/kaikoma-soft"},"headline":"ftp(proftpd) と連携して、ftp経由で再生した動画ファイルの未視聴／視聴済を管理するプログラム","url":"/src/seesaw2.html"}</script>
 <!-- End Jekyll SEO tag -->
 
     <link rel="stylesheet" href="/assets/css/myStyle.css">
@@ -56,18 +56,16 @@
         <h2 id="seesaw-とは">seesaw とは</h2>
 
 <p>本プログラムは,
-Samba と連携して、Samba経由で再生した動画ファイルの
+ftp(proftpd) と連携して、ftp経由で再生した動画ファイルの
 未視聴／視聴済 を記録し、playList を生成する
 ソフトウェアです。</p>
 
 <font color="red">注意</font>
-<p>samba-4.13.17 からアクセスログのフォーマットが変わった為、
-期待通りに動作しない。<br />
-本プログラムを使う為には samba-4.12.15 以下を使う必要がある。</p>
+<p>Ver1 では samba を使用していたが、Ver2 からは ftp(proftpd) を使うようにした。</p>
 
 <h2 id="背景目的">背景・目的</h2>
 
-<p>PC で録画した動画ファイルを、居間の TV に接続した Fire TV stick や、
+<p>PC で録画した動画ファイルを、居間の TV に接続した Fire TV stick+VLC や、
 タブレットの VLC 等の再生ソフトを使って視聴しているが、
 ファイルが溜まってくると、見た／見ていないの管理が煩わしい。
 （後でBDに保存するので、見たら消す方式は使えない。）
@@ -131,25 +129,43 @@ Samba と連携して、Samba経由で再生した動画ファイルの
 
 <h2 id="プログラム構成図">プログラム構成図</h2>
 
-<p><a href="/img/seesaw_diagram.png"><img src="/img/seesaw_diagram.png" alt="" class="ssimg" /></a></p>
+<p><a href="/img/seesaw_diagram2.png"><img src="/img/seesaw_diagram2.png" alt="" class="ssimg" /></a></p>
 
-<h2 id="インストール方法">インストール方法</h2>
-
-<h3 id="seesaw-その１">seesaw (その１)</h3>
+<h2 id="インストール方法-ubuntu-24-の場合">インストール方法 (ubuntu 24 の場合)</h2>
 
 <ul>
   <li>必要なパッケージを apt install でインストールする。
     <ul>
       <li>git</li>
       <li>ruby</li>
-      <li>samba</li>
+      <li>proftpd-core</li>
       <li>ruby-sqlite3</li>
+    </ul>
+
+    <p><code class="language-plaintext highlighter-rouge">% sudo apt install git ruby proftpd-core ruby-sqlite3</code></p>
+  </li>
+  <li>proftpd の設定<br />
+/etc/proftpd/proftpd.conf に下記の設定を追加する。
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LogFormat custom "%u %{iso8601} \"%r\" %s \"%S\" %b"
+ExtendedLog    /var/log/proftpd/extende.log  READ,INFO,EXIT custom
+</code></pre></div>    </div>
+    <ul>
+      <li>必要に応じて log ローテーションの設定を行う。<br />
+ただし視聴中に log ローテーション が起きると seesaw が誤動作するので、
+適切な時間に実行されるようにする。<br />
+設定は OS によって異なるが ubuntu 24 の場合は
+<code class="language-plaintext highlighter-rouge">/usr/lib/systemd/system/logrotate.timer</code>
+の OnCalendar を変更する。
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  #OnCalendar=daily               # 日付が変わった直後
+  OnCalendar=*-*-* 6:00:00        # 午前6時
+</code></pre></div>        </div>
+      </li>
     </ul>
   </li>
   <li>
-    <p>インストールするディレクトリに移動し,</p>
+    <p>seesaw をインストールするディレクトリに移動し,</p>
 
-    <p><code class="language-plaintext highlighter-rouge">% git clone https://github.com/kaikoma-soft/seesaw.git</code></p>
+    <p><code class="language-plaintext highlighter-rouge">% git clone --depth=1 https://github.com/kaikoma-soft/seesaw.git .</code></p>
   </li>
   <li>
     <p>出力先のディレクトリを作成し、次項の config.rb の BaseDir に設定する。</p>
@@ -175,8 +191,8 @@ Samba と連携して、Samba経由で再生した動画ファイルの
       <td> </td>
     </tr>
     <tr>
-      <td>SambaLog</td>
-      <td>samba のアクセスログファイル名</td>
+      <td>ProftpdLogFN</td>
+      <td>proftpd の ExtendedLogファイル名</td>
       <td> </td>
     </tr>
     <tr>
@@ -219,62 +235,14 @@ Samba と連携して、Samba経由で再生した動画ファイルの
 
 <ul>
   <li>
-    <p>動作確認の為テスト実行する。
-エラーメッセージが出なければ Ctrl-C で中止</p>
+    <p>動作確認の為テスト実行する。<br />
+エラーメッセージが出ず、シンボリックリンクが作成されれば問題ないので
+Ctrl-C で中止</p>
 
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> % sudo touch /var/log/smb_acc.log
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> % sudo touch /var/log/proftpd/extende.log
  % ruby seesaw.rb
 </code></pre></div>    </div>
   </li>
-</ul>
-
-<h3 id="samba">samba</h3>
-
-<ul>
-  <li>
-    <p>/etc/samba/smb.conf に下記の項を追加する。
-path には、<code class="language-plaintext highlighter-rouge">${BaseDir}/playlist</code> を設定する。</p>
-
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[global]
-  wide links = yes
-  unix extensions  = no
-[seesaw]
-  path = /data/seesaw/playlist
-  public = no
-  vfs objects = full_audit
-  full_audit:prefix = %T|%u
-  full_audit:success = open close
-  full_audit:failure = none
-  full_audit:facility = LOCAL7
-  full_audit:priority = NOTICE
-</code></pre></div>    </div>
-  </li>
-  <li>
-    <p>変更後にリスタート
-  <code class="language-plaintext highlighter-rouge">% sudo systemctl restart smbd</code></p>
-  </li>
-</ul>
-
-<h3 id="syslog">syslog</h3>
-<ul>
-  <li>
-    <p>/etc/rsyslog.d/50-samba.conf を下記の内容で、新規作成する。</p>
-
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>local7.*                        -/var/log/smb_acc.log
-</code></pre></div>    </div>
-  </li>
-  <li>
-    <p>変更後にリスタート
-<code class="language-plaintext highlighter-rouge">% sudo systemctl restart syslog</code></p>
-  </li>
-  <li>
-    <p>samba 上のファイルにアクセスして、アクセスログに出力される事を確認する。</p>
-  </li>
-</ul>
-
-<h3 id="seesaw-その2">seesaw (その2)</h3>
-
-<ul>
   <li>
     <p>seesaw をバックグラウンドで、実行する。</p>
 
@@ -308,7 +276,7 @@ path には、<code class="language-plaintext highlighter-rouge">${BaseDir}/play
 <p>–notyet/done の時に test mode(表示のみ)にする。</p>
 
 <h5 id="-k-kill">-k, –kill</h5>
-<p>バックグラウンドで、動いているseesaw を停止させる。</p>
+<p>バックグラウンドで動いている seesaw を停止させる。</p>
 
 <h5 id="-l-loglevel-n">-l, –loglevel n</h5>
 <p>log に出力するレベルを指定する。n = 0〜5 でデフォルトは 1</p>
@@ -318,7 +286,7 @@ path には、<code class="language-plaintext highlighter-rouge">${BaseDir}/play
 
 <h2 id="状態遷移の動作説明">状態遷移の動作説明</h2>
 
-<p>samba で共有された動画ファイルに対して、次の操作をした場合に状態遷移が起きる。
+<p>ftp経由で、動画ファイルに対して次の操作をした場合に状態遷移が起きる。
 <br />
 なお操作２は、操作1の終了から FlipDelay で指定した秒数以内で行う操作のこと。</p>
 
@@ -366,40 +334,24 @@ path には、<code class="language-plaintext highlighter-rouge">${BaseDir}/play
 
 <h2 id="動作確認環境">動作確認環境</h2>
 
-<p>サーバー側</p>
-
 <table>
   <thead>
     <tr>
-      <th>マシン</th>
-      <th>OS</th>
+      <th>サーバー側</th>
+      <th>クライアント(1)</th>
+      <th>クライアント(2)</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>PC</td>
-      <td>Ubuntu 18.04.3 LTS</td>
-    </tr>
-  </tbody>
-</table>
-
-<p>クライアント側</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>マシン</th>
-      <th>再生ソフト</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Fire HD 10</td>
-      <td>VLC for Android Ver 3.2.6</td>
+      <td>Ubuntu 22.04.4 LTS</td>
+      <td>Fire HD 10 (2022)</td>
+      <td>Fire stick TV 4k</td>
     </tr>
     <tr>
-      <td>Fire TV stick</td>
-      <td>VLC for Android Ver 3.1.4</td>
+      <td>ProFTPD Version 1.3.8b</td>
+      <td>VLC 3.5.4</td>
+      <td>VLC 3.5.4</td>
     </tr>
   </tbody>
 </table>
