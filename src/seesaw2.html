@@ -147,7 +147,7 @@ ftp(proftpd) と連携して、ftp経由で再生した動画ファイルの
   <li>proftpd の設定<br />
 /etc/proftpd/proftpd.conf に下記の設定を追加する。
     <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LogFormat custom "%u %{iso8601} \"%r\" %s \"%S\" %b"
-ExtendedLog    /var/log/proftpd/extende.log  READ,INFO,EXIT custom
+ExtendedLog    /var/log/proftpd/extende.log  READ,MISC,EXIT custom
 </code></pre></div>    </div>
     <ul>
       <li>必要に応じて log ローテーションの設定を行う。<br />
