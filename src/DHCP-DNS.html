@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Raspberry Pi 3B+ で、DHCP,DNS サーバー構築 | ナマケモノの家</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Raspberry Pi 3B+ で、DHCP,DNS サーバー構築" />
+<meta name="author" content="kaikoma-soft" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="ナマケモノの家" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Raspberry Pi 3B+ で、DHCP,DNS サーバー構築" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"kaikoma-soft","url":"https://github.com/kaikoma-soft"},"headline":"Raspberry Pi 3B+ で、DHCP,DNS サーバー構築","url":"/src/DHCP-DNS.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/myStyle.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header"><a href="/"> ナマケモノの家</a></h1>
+        <p class="header"><img src="https://kaikoma-soft.github.io/img/namakemono.jpg" alt="ナマケモノ"> </p>
+
+        <ul>
+          
+
+        </ul>
+
+<!--
+        
+          <p class="header">This project is maintained by <a class="header name" href="https://github.com/kaikoma-soft">kaikoma-soft</a></p>
+        
+        
+        
+-->
+          <ul>
+            <li><a class="buttons github" href="https://kaikoma-soft.github.io/index.html">GitHub Page Top</a></li>
+            <li><a class="buttons github" href="https://github.com/kaikoma-soft">GitHub Top</a></li>
+            <li><a class="buttons github" href="http://www.asahi-net.or.jp/~sy8y-siy/">Home Page Top</a></li>
+          </ul>
+
+      </header>
+
+      <section>
+        <h1 id="はじめに">はじめに</h1>
+
+<p>余剰になった Raspberry Pi 3B+ で、DHCP,DNS サーバー を構築した時のメモ</p>
+
+<ul>
+  <li>
+    <p>条件</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>値</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SBC</td>
+          <td>Raspberry Pi 3B+</td>
+        </tr>
+        <tr>
+          <td>OS</td>
+          <td>Raspberry Pi OS lite (64-bit bookworm )</td>
+        </tr>
+        <tr>
+          <td>ネットワーク</td>
+          <td>有線LAN 固定IP</td>
+        </tr>
+        <tr>
+          <td>実施日</td>
+          <td>2025/02/26</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ul>
+
+<h1 id="os-インストール">OS インストール</h1>
+
+<ol>
+  <li>rpi-imager を使って SD カードに OS のイメージを書き込む。
+    <ul>
+      <li>ホスト名は pi.local (mDNS で引くので、既存のものと重複しないように。後で変更する)</li>
+      <li>有線LAN (インストール時に固定IPは出来ない。dhcp 必須。)</li>
+      <li>SSH を有効に</li>
+    </ul>
+  </li>
+  <li>SDカードを挿して起動し、ヘッドレスで接続する。
+    <ul>
+      <li>初回は boot に時間かかるので、しばらく待ってから ssh で login
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ ssh pi.local 
+</code></pre></div>        </div>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>OS のアップデート</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo apt update 
+$ sudo apt -y upgrade
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>DHCPサーバーなので、IPアドレスを固定とする。</p>
+
+    <table>
+ <tr> <td> 自アドレス </td> <td>192.168.1.2/24 </td></tr>
+ <tr> <td> gateway </td> <td> 192.168.1.1</td></tr>
+ <tr> <td> DNS </td> <td> 192.168.1.2,8.8.8.8</td></tr>
+ <tr> <td> IPv6 </td> <td> 停止 </td></tr>
+ <tr> <td> ドメイン </td> <td> home </td></tr>
+ </table>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ nmcli connection show
+ $ sudo nmcli connection modify "Wired connection 1" ipv4.addresses 192.168.1.2/24
+ $ sudo nmcli connection modify "Wired connection 1" ipv4.gateway 192.168.1.1
+ $ sudo nmcli connection modify "Wired connection 1" ipv4.dns 192.168.1.2,8.8.8.8
+ $ sudo nmcli connection modify "Wired connection 1" ipv4.dns-search home
+ $ sudo nmcli connection modify "Wired connection 1" ipv4.method manual
+ $ sudo nmcli connection modify "Wired connection 1" ipv6.method disabled
+ $ sudo nmcli connection up "Wired connection 1"
+</code></pre></div>    </div>
+    <ul>
+      <li>“Wired connection 1” は、nmcli connection show で出てきた NAME</li>
+      <li>up と同時に IP が変わるので接続が切れる。</li>
+    </ul>
+  </li>
+  <li>
+    <p>mail の設定 (smtpサーバーに投げるだけ)</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt install -y msmtp-mta msmtp
+</code></pre></div>    </div>
+    <p>の後 ~/.msmtprc を適宜設定</p>
+  </li>
+  <li>
+    <p>ntp(chrony) の設定</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt -y install chrony
+</code></pre></div>    </div>
+    <p>の後 /etc/chrony/chrony.conf を適宜設定</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo systemctl restart  chrony
+ $ sleep 10 ; chronyc sources
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>ロケールの設定</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo raspi-config
+  1. 5 Localisation Options
+    1. L1 Locale       Configure language and regional settings
+</code></pre></div>    </div>
+    <p>で <code class="language-plaintext highlighter-rouge">ja_JP.UTF-8</code> に設定する。</p>
+  </li>
+  <li>
+    <p>DNSサーバー(unbound) のインストール (設定は後述)</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt -y install bind9-host unbound
+ $ sudo systemctl stop  unbound
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>DHCPサーバー(udhcpd) のインストール (設定は後述)</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt -y install udhcpd
+ $ sudo systemctl stop udhcpd
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h1 id="os-カスタマイズ不要なサービスの停止">OS カスタマイズ(不要なサービスの停止)</h1>
+
+<ol>
+  <li>
+    <p>/boot/firmware/config.txt を修正する</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> #dtparam=audio=on              # コメントアウト
+ #camera_auto_detect=1          # コメントアウト
+ #dtoverlay=vc4-kms-v3d         # コメントアウト
+ #max_framebuffers=2            # コメントアウト
+ #disable_overscan=1            # コメントアウト
+ dtoverlay=disable-bt           # 追記
+ dtoverlay=disable-wifi         # 追記
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>IPv6 の停止の為に /boot/firmware/cmdline.txt に <code class="language-plaintext highlighter-rouge">ipv6.disable=1</code> を追加</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> console=serial0,115200 console=tty1 root=PARTUUID=ca2c7784-02 rootfstype=ext4 ipv6.disable=1 fsck.repair=yes rootwait
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>/etc/modprobe.d/raspi-blacklist.conf に下記を設定</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> blacklist bcm2835_codec
+ blacklist bcm2835_v4l2
+ blacklist bcm2835_isp
+ blacklist snd_bcm2835
+ blacklist drm
+ blacklist dm_mod
+ blacklist ipv6
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h1 id="sdカードの長寿命化">SDカードの長寿命化</h1>
+
+<ol>
+  <li>
+    <p>スワップを使用しない</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo apt remove -y dphys-swapfile
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>/tmp等 を RAMディスク に変更 /etc/fstab に追記</p>
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> tmpfs   /tmp         tmpfs   defaults,size=64m,noatime,mode=1777  0  0
+ tmpfs   /var/tmp     tmpfs   defaults,size=16m,noatime,mode=1777  0  0
+ tmpfs   /var/log     tmpfs   defaults,size=32m,noatime,mode=0755  0  0
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h1 id="dns-unbound-の設定">DNS (unbound) の設定</h1>
+
+<ol>
+  <li>
+    <p>/etc/unbound/unbound.conf に設定
+下記は設定例</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> server:
+     verbosity: 1
+    
+     interface: 0.0.0.0
+     interface: 127.0.0.1
+     access-control: 192.168.0.0/16 allow
+     access-control: 127.0.0.0/8 allow
+     do-ip6: no
+    
+    local-zone: "home." static
+    local-data: "gw.home.                IN A 192.168.1.1"
+    local-data: "dhcpd.home.             IN A 192.168.1.2"
+    local-data: "dns.home.               IN A 192.168.1.2"
+    local-data: "book.home.              IN A 192.168.1.2"
+    local-data: "raspi.home.             IN A 192.168.1.2"
+    local-data: "ubuntu.home.            IN A 192.168.1.3"
+    
+ forward-zone:
+     name: "."
+     forward-addr: 8.8.8.8
+     forward-addr: 8.8.4.4
+    
+ remote-control:
+</code></pre></div>    </div>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo systemctl restart unbound
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h1 id="dhcpd-udhcpd-の設定">DHCPD (udhcpd) の設定</h1>
+
+<table>
+  <tr> <td> 配布アドレス </td> <td>192.168.1.233 -&gt; 252 </td></tr>
+  <tr> <td> gateway </td> <td> 192.168.1.1</td></tr>
+  <tr> <td> DNS </td> <td> 192.168.1.2,8.8.8.8</td></tr>
+  <tr> <td> ドメイン </td> <td> home </td></tr>
+</table>
+
+<ol>
+  <li>
+    <p>/etc/udhcpd.conf に設定</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> start   192.168.1.233
+ end     192.168.1.252
+ interface   eth0
+ max_leases  20
+ option  subnet  255.255.255.0
+ option  domain  home
+ option  lease   864000
+ opt dns 192.168.1.2, 8.8.8.8
+ opt router  192.168.1.1
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>/etc/default/udhcpd を編集して no -&gt; yes にしてから</p>
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo systemctl restart udhcpd
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+
+      </section>
+
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
